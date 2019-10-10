@@ -44,11 +44,14 @@ using static MenusC;
 using static VGA256dC;
 using static ShotsC;
 using static LdsPlayC;
+using static MouseC;
+using static JoystickC;
 using static System.Math;
 
 using System.IO;
 using System.Collections;
 using UnityEngine;
+using static SurfaceC;
 
 public static class Tyrian2C
 {
@@ -159,9 +162,474 @@ public static class Tyrian2C
         return ret;
     }
 
+    private static void blit_enemy(Surface surface, int i, int x_offset, int y_offset, int sprite_offset)
+    {
+        if (enemy[i].sprite2s == null)
+        {
+            //fprintf(stderr, "warning: enemy %d sprite missing\n", i);
+            return;
+        }
+
+        int x = enemy[i].ex + x_offset + tempMapXOfs,
+            y = enemy[i].ey + y_offset;
+        int index = enemy[i].egr[enemy[i].enemycycle - 1] + sprite_offset;
+
+        if (enemy[i].filter != 0)
+            blit_sprite2_filter(surface, x, y, enemy[i].sprite2s, index, enemy[i].filter);
+        else
+            blit_sprite2(surface, x, y, enemy[i].sprite2s, index);
+    }
+
+    private static void JE_drawEnemy(int enemyOffset) // actually does a whole lot more than just drawing
+    {
+        player[0].x -= 25;
+
+        for (int i = enemyOffset - 25; i < enemyOffset; i++)
+        {
+            if (enemyAvail[i] != 1)
+            {
+                enemy[i].mapoffset = tempMapXOfs;
+
+                if (enemy[i].xaccel != 0 && enemy[i].xaccel - 89u > mt_rand() % 11)
+                {
+                    if (player[0].x > enemy[i].ex)
+                    {
+                        if (enemy[i].exc < enemy[i].xaccel - 89)
+                            enemy[i].exc++;
+                    }
+                    else
+                    {
+                        if (enemy[i].exc >= 0 || -enemy[i].exc < enemy[i].xaccel - 89)
+                            enemy[i].exc--;
+                    }
+                }
+
+                if (enemy[i].yaccel != 0 && enemy[i].yaccel - 89u > mt_rand() % 11)
+                {
+                    if (player[0].y > enemy[i].ey)
+                    {
+                        if (enemy[i].eyc < enemy[i].yaccel - 89)
+                            enemy[i].eyc++;
+                    }
+                    else
+                    {
+                        if (enemy[i].eyc >= 0 || -enemy[i].eyc < enemy[i].yaccel - 89)
+                            enemy[i].eyc--;
+                    }
+                }
+
+                if (enemy[i].ex + tempMapXOfs > -29 && enemy[i].ex + tempMapXOfs < 300)
+                {
+                    if (enemy[i].aniactive == 1)
+                    {
+                        enemy[i].enemycycle++;
+
+                        if (enemy[i].enemycycle == enemy[i].animax)
+                            enemy[i].aniactive = enemy[i].aniwhenfire;
+                        else if (enemy[i].enemycycle > enemy[i].ani)
+                            enemy[i].enemycycle = enemy[i].animin;
+                    }
+
+                    if (enemy[i].egr[enemy[i].enemycycle - 1] == 999)
+                        goto enemy_gone;
+
+                    if (enemy[i].size == 1) // 2x2 enemy
+                    {
+                        if (enemy[i].ey > -13)
+                        {
+                            blit_enemy(VGAScreen, i, -6, -7, 0);
+                            blit_enemy(VGAScreen, i, 6, -7, 1);
+                        }
+                        if (enemy[i].ey > -26 && enemy[i].ey < 182)
+                        {
+                            blit_enemy(VGAScreen, i, -6, 7, 19);
+                            blit_enemy(VGAScreen, i, 6, 7, 20);
+                        }
+                    }
+                    else
+                    {
+                        if (enemy[i].ey > -13)
+                            blit_enemy(VGAScreen, i, 0, 0, 0);
+                    }
+
+                    enemy[i].filter = 0;
+                }
+
+                if (enemy[i].excc != 0)
+                {
+                    if (--enemy[i].exccw <= 0)
+                    {
+                        if (enemy[i].exc == enemy[i].exrev)
+                        {
+                            enemy[i].excc = (sbyte)-enemy[i].excc;
+                            enemy[i].exrev = (sbyte)-enemy[i].exrev;
+                            enemy[i].exccadd = (short)-enemy[i].exccadd;
+                        }
+                        else
+                        {
+                            enemy[i].exc += (sbyte)enemy[i].exccadd;
+                            enemy[i].exccw = (sbyte)enemy[i].exccwmax;
+                            if (enemy[i].exc == enemy[i].exrev)
+                            {
+                                enemy[i].excc = (sbyte)-enemy[i].excc;
+                                enemy[i].exrev = (sbyte)-enemy[i].exrev;
+                                enemy[i].exccadd = (short)-enemy[i].exccadd;
+                            }
+                        }
+                    }
+                }
+
+                if (enemy[i].eycc != 0)
+                {
+                    if (--enemy[i].eyccw <= 0)
+                    {
+                        if (enemy[i].eyc == enemy[i].eyrev)
+                        {
+                            enemy[i].eycc = (sbyte)-enemy[i].eycc;
+                            enemy[i].eyrev = (sbyte)-enemy[i].eyrev;
+                            enemy[i].eyccadd = (short)-enemy[i].eyccadd;
+                        }
+                        else
+                        {
+                            enemy[i].eyc += (sbyte)enemy[i].eyccadd;
+                            enemy[i].eyccw = (sbyte)enemy[i].eyccwmax;
+                            if (enemy[i].eyc == enemy[i].eyrev)
+                            {
+                                enemy[i].eycc = (sbyte)-enemy[i].eycc;
+                                enemy[i].eyrev = (sbyte)-enemy[i].eyrev;
+                                enemy[i].eyccadd = (short)-enemy[i].eyccadd;
+                            }
+                        }
+                    }
+                }
+
+                enemy[i].ey += enemy[i].fixedmovey;
+
+                enemy[i].ex += enemy[i].exc;
+                if (enemy[i].ex < -80 || enemy[i].ex > 340)
+                    goto enemy_gone;
+
+                enemy[i].ey += enemy[i].eyc;
+                if (enemy[i].ey < -112 || enemy[i].ey > 190)
+                    goto enemy_gone;
+
+                goto enemy_still_exists;
+
+            enemy_gone:
+                /* enemy[i].egr[10] &= 0x00ff; <MXD> madness? */
+                enemyAvail[i] = 1;
+                goto draw_enemy_end;
+
+            enemy_still_exists:
+
+                /*X bounce*/
+                if (enemy[i].ex <= enemy[i].xminbounce || enemy[i].ex >= enemy[i].xmaxbounce)
+                    enemy[i].exc = (sbyte)-enemy[i].exc;
+
+                /*Y bounce*/
+                if (enemy[i].ey <= enemy[i].yminbounce || enemy[i].ey >= enemy[i].ymaxbounce)
+                    enemy[i].eyc = (sbyte)-enemy[i].eyc;
+
+                /* Evalue != 0 - score item at boundary */
+                if (enemy[i].scoreitem)
+                {
+                    if (enemy[i].ex < -5)
+                        enemy[i].ex++;
+                    if (enemy[i].ex > 245)
+                        enemy[i].ex--;
+                }
+
+                enemy[i].ey += (short)tempBackMove;
+
+                if (enemy[i].ex <= -24 || enemy[i].ex >= 296)
+                    goto draw_enemy_end;
+
+                tempX = (ushort)enemy[i].ex;
+                tempY = (ushort)enemy[i].ey;
+
+                temp = enemy[i].enemytype;
+
+                /* Enemy Shots */
+                if (enemy[i].edamaged)
+                    goto draw_enemy_end;
+
+                enemyOnScreen++;
+
+                if (enemy[i].iced != 0)
+                {
+                    enemy[i].iced--;
+                    if (enemy[i].enemyground)
+                    {
+                        enemy[i].filter = 0x09;
+                    }
+                    goto draw_enemy_end;
+                }
+
+                for (int j = 3; j > 0; j--)
+                {
+                    if (enemy[i].freq[j - 1] != 0)
+                    {
+                        temp3 = enemy[i].tur[j - 1];
+
+                        if (--enemy[i].eshotwait[j - 1] == 0 && temp3 != 0)
+                        {
+                            enemy[i].eshotwait[j - 1] = enemy[i].freq[j - 1];
+                            if (difficultyLevel > 2)
+                            {
+                                enemy[i].eshotwait[j - 1] = (byte)((enemy[i].eshotwait[j - 1] / 2) + 1);
+                                if (difficultyLevel > 7)
+                                    enemy[i].eshotwait[j - 1] = (byte)((enemy[i].eshotwait[j - 1] / 2) + 1);
+                            }
+
+                            if (galagaMode && (enemy[i].eyc == 0 || (mt_rand() % 400) >= galagaShotFreq))
+                                goto draw_enemy_end;
+
+                            switch (temp3)
+                            {
+                                case 252: /* Savara Boss DualMissile */
+                                    if (enemy[i].ey > 20)
+                                    {
+                                        JE_setupExplosion(tempX - 8 + tempMapXOfs, tempY - 20 - backMove * 8, -2, 6, false, false);
+                                        JE_setupExplosion(tempX + 4 + tempMapXOfs, tempY - 20 - backMove * 8, -2, 6, false, false);
+                                    }
+                                    break;
+                                case 251:
+                                    ; /* Suck-O-Magnet */
+                                    int attractivity = 4 - (Abs(player[0].x - tempX) + Abs(player[0].y - tempY)) / 100;
+                                    player[0].x_velocity += (short)((player[0].x > tempX) ? -attractivity : attractivity);
+                                    break;
+                                case 253: /* Left ShortRange Magnet */
+                                    if (Abs(player[0].x + 25 - 14 - tempX) < 24 && Abs(player[0].y - tempY) < 28)
+                                    {
+                                        player[0].x_velocity += 2;
+                                    }
+                                    if (twoPlayerMode &&
+                                       (Abs(player[1].x - 14 - tempX) < 24 && Abs(player[1].y - tempY) < 28))
+                                    {
+                                        player[1].x_velocity += 2;
+                                    }
+                                    break;
+                                case 254: /* Left ShortRange Magnet */
+                                    if (Abs(player[0].x + 25 - 14 - tempX) < 24 && Abs(player[0].y - tempY) < 28)
+                                    {
+                                        player[0].x_velocity -= 2;
+                                    }
+                                    if (twoPlayerMode &&
+                                       (Abs(player[1].x - 14 - tempX) < 24 && Abs(player[1].y - tempY) < 28))
+                                    {
+                                        player[1].x_velocity -= 2;
+                                    }
+                                    break;
+                                case 255: /* Magneto RePulse!! */
+                                    if (difficultyLevel != 1) /*DIF*/
+                                    {
+                                        if (j == 3)
+                                        {
+                                            enemy[i].filter = 0x70;
+                                        }
+                                        else
+                                        {
+                                            int repulsivity = 4 - (Abs(player[0].x - tempX) + Abs(player[0].y - tempY)) / 20;
+                                            if (repulsivity > 0)
+                                                player[0].x_velocity += (short)((player[0].x > tempX) ? repulsivity : -repulsivity);
+                                        }
+                                    }
+                                    break;
+                                default:
+                                    /*Rot*/
+                                    for (int tempCount = weapons[temp3].multi; tempCount > 0; tempCount--)
+                                    {
+                                        for (b = 0; b < ENEMY_SHOT_MAX; b++)
+                                        {
+                                            if (enemyShotAvail[b])
+                                                break;
+                                        }
+                                        if (b == ENEMY_SHOT_MAX)
+                                            goto draw_enemy_end;
+
+                                        enemyShotAvail[b] = !enemyShotAvail[b];
+
+                                        if (weapons[temp3].sound > 0)
+                                        {
+                                            do
+                                                temp = (int)(mt_rand() % 8);
+                                            while (temp == 3);
+                                            soundQueue[temp] = weapons[temp3].sound;
+                                        }
+
+                                        if (enemy[i].aniactive == 2)
+                                            enemy[i].aniactive = 1;
+
+                                        if (++enemy[i].eshotmultipos[j - 1] > weapons[temp3].max)
+                                            enemy[i].eshotmultipos[j - 1] = 1;
+
+                                        int tempPos = enemy[i].eshotmultipos[j - 1] - 1;
+
+                                        if (j == 1)
+                                            temp2 = 4;
+
+                                        enemyShot[b].sx = (short)(tempX + weapons[temp3].bx[tempPos] + tempMapXOfs);
+                                        enemyShot[b].sy = (short)(tempY + weapons[temp3].by[tempPos]);
+                                        enemyShot[b].sdmg = weapons[temp3].attack[tempPos];
+                                        enemyShot[b].tx = weapons[temp3].tx;
+                                        enemyShot[b].ty = weapons[temp3].ty;
+                                        enemyShot[b].duration = weapons[temp3].del[tempPos];
+                                        enemyShot[b].animate = 0;
+                                        enemyShot[b].animax = weapons[temp3].weapani;
+
+                                        enemyShot[b].sgr = weapons[temp3].sg[tempPos];
+                                        switch (j)
+                                        {
+                                            case 1:
+                                                enemyShot[b].syc = weapons[temp3].acceleration;
+                                                enemyShot[b].sxc = weapons[temp3].accelerationx;
+
+                                                enemyShot[b].sxm = weapons[temp3].sx[tempPos];
+                                                enemyShot[b].sym = weapons[temp3].sy[tempPos];
+                                                break;
+                                            case 3:
+                                                enemyShot[b].sxc = (sbyte)-weapons[temp3].acceleration;
+                                                enemyShot[b].syc = (sbyte)weapons[temp3].accelerationx;
+
+                                                enemyShot[b].sxm = (short)-weapons[temp3].sy[tempPos];
+                                                enemyShot[b].sym = (short)-weapons[temp3].sx[tempPos];
+                                                break;
+                                            case 2:
+                                                enemyShot[b].sxc = (sbyte)weapons[temp3].acceleration;
+                                                enemyShot[b].syc = (sbyte)-weapons[temp3].acceleration;
+
+                                                enemyShot[b].sxm = (short)weapons[temp3].sy[tempPos];
+                                                enemyShot[b].sym = (short)-weapons[temp3].sx[tempPos];
+                                                break;
+                                        }
+
+                                        if (weapons[temp3].aim > 0)
+                                        {
+                                            int aim = weapons[temp3].aim;
+
+                                            /*DIF*/
+                                            if (difficultyLevel > 2)
+                                            {
+                                                aim += difficultyLevel - 2;
+                                            }
+
+                                            int target_x = player[0].x;
+                                            int target_y = player[0].y;
+
+                                            if (twoPlayerMode)
+                                            {
+                                                // fire at live player(s)
+                                                if (player[0].is_alive && !player[1].is_alive)
+                                                    temp = 0;
+                                                else if (player[1].is_alive && !player[0].is_alive)
+                                                    temp = 1;
+                                                else
+                                                    temp = (int)(mt_rand() % 2);
+
+                                                if (temp == 1)
+                                                {
+                                                    target_x = player[1].x - 25;
+                                                    target_y = player[1].y;
+                                                }
+                                            }
+
+                                            int relative_x = (target_x + 25) - tempX - tempMapXOfs - 4;
+                                            if (relative_x == 0)
+                                                relative_x = 1;
+                                            int relative_y = target_y - tempY;
+                                            if (relative_y == 0)
+                                                relative_y = 1;
+                                            int longest_side = Max(Abs(relative_x), Abs(relative_y));
+                                            enemyShot[b].sxm = (short)Round((float)relative_x / longest_side * aim);
+                                            enemyShot[b].sym = (short)Round((float)relative_y / longest_side * aim);
+                                        }
+                                    }
+                                    break;
+                            }
+                        }
+                    }
+                }
+
+                /* Enemy Launch Routine */
+                if (enemy[i].launchfreq != 0)
+                {
+                    if (--enemy[i].launchwait == 0)
+                    {
+                        enemy[i].launchwait = enemy[i].launchfreq;
+
+                        if (enemy[i].launchspecial != 0)
+                        {
+                            /*Type  1 : Must be inline with player*/
+                            if (Abs(enemy[i].ey - player[0].y) > 5)
+                                goto draw_enemy_end;
+                        }
+
+                        if (enemy[i].aniactive == 2)
+                        {
+                            enemy[i].aniactive = 1;
+                        }
+
+                        if (enemy[i].launchtype == 0)
+                            goto draw_enemy_end;
+
+                        tempW = enemy[i].launchtype;
+                        b = JE_newEnemy(enemyOffset == 50 ? 75 : enemyOffset - 25, tempW, 0);
+
+                        /*Launch Enemy Placement*/
+                        if (b > 0)
+                        {
+
+                            JE_SingleEnemyType e = enemy[b - 1];
+
+                            e.ex = (short)tempX;
+                            e.ey = (short)(tempY + enemyDat[e.enemytype].startyc);
+                            if (e.size == 0)
+                                e.ey -= 7;
+
+                            if (e.launchtype > 0 && e.launchfreq == 0)
+                            {
+                                if (e.launchtype > 90)
+                                {
+                                    e.ex += (short)(mt_rand() % ((e.launchtype - 90) * 4) - (e.launchtype - 90) * 2);
+                                }
+                                else
+                                {
+                                    int target_x = (player[0].x + 25) - tempX - tempMapXOfs - 4;
+                                    if (target_x == 0)
+                                        target_x = 1;
+                                    int tempI5 = player[0].y - tempY;
+                                    if (tempI5 == 0)
+                                        tempI5 = 1;
+                                    int longest_side = Max(Abs(target_x), Abs(tempI5));
+                                    e.exc = (sbyte)Round(((float)target_x / longest_side) * e.launchtype);
+                                    e.eyc = (sbyte)Round(((float)tempI5 / longest_side) * e.launchtype);
+                                }
+                            }
+
+                            do
+                                temp = (int)(mt_rand() % 8);
+                            while (temp == 3);
+                            soundQueue[temp] = randomEnemyLaunchSounds[(mt_rand() % 3)];
+
+                            if (enemy[i].launchspecial == 1
+                                && enemy[i].linknum < 100)
+                            {
+                                e.linknum = enemy[i].linknum;
+                            }
+                        }
+                    }
+                }
+            }
+        draw_enemy_end:
+            ;
+        }
+
+        player[0].x += 25;
+    }
 
     public static IEnumerator e_JE_main()
-    { UnityEngine.Debug.Log("e_JE_main");
+    {
+        UnityEngine.Debug.Log("e_JE_main");
         string buffer;
 
         int lastEnemyOnScreen;
@@ -198,6 +666,7 @@ public static class Tyrian2C
             JE_setTimerInt();
         }
 
+        //ED TODO: Demo support
         //if (play_demo || record_demo)
         //{
         //    if (demo_file)
@@ -464,6 +933,7 @@ public static class Tyrian2C
             JE_saveGame((byte)temp, "LAST LEVEL    ");
         }
 
+        //ED TODO: Demo support
         //if (!play_demo && record_demo)
         //{
         //    byte new_demo_num = 0;
@@ -619,8 +1089,19 @@ public static class Tyrian2C
 
 
         /*Background Wrapping*/
-        //Must happen in a method call; cannot occur directly in an iterator
-        unsafeBackgroundWrapping();
+        if (mapYPos <= BKwrap1)
+        {
+            mapYPos = BKwrap1to;
+        }
+        if (mapY2Pos <= BKwrap2)
+        {
+            mapY2Pos = BKwrap2to;
+        }
+        if (mapY3Pos <= BKwrap3)
+        {
+            mapY3Pos = BKwrap3to;
+        }
+
 
         allPlayersGone = all_players_dead() &&
                          ((player[0].lives == 1 && player[0].exploding_ticks == 0) || (!onePlayerAction && !twoPlayerMode)) &&
@@ -859,33 +1340,31 @@ public static class Tyrian2C
             VGAScreen = game_screen;
         }
 
-        //ED TODO: ENEMY: Uncomment this
-
         /*-----------------------Ground Enemy------------------------*/
-        //lastEnemyOnScreen = enemyOnScreen;
+        lastEnemyOnScreen = enemyOnScreen;
 
-        //tempMapXOfs = mapXOfs;
-        //tempBackMove = backMove;
-        //JE_drawEnemy(50);
-        //JE_drawEnemy(100);
+        tempMapXOfs = mapXOfs;
+        tempBackMove = backMove;
+        JE_drawEnemy(50);
+        JE_drawEnemy(100);
 
-        //if (enemyOnScreen == 0 || enemyOnScreen == lastEnemyOnScreen)
-        //{
-        //    if (stopBackgroundNum == 1)
-        //        stopBackgroundNum = 9;
-        //}
+        if (enemyOnScreen == 0 || enemyOnScreen == lastEnemyOnScreen)
+        {
+            if (stopBackgroundNum == 1)
+                stopBackgroundNum = 9;
+        }
 
-        //if (smoothies[0] && processorType > 2 && smoothie_data[0] > 0)
-        //{
-        //    lava_filter(game_screen, VGAScreen);
-        //    VGAScreen = game_screen;
-        //}
+        if (smoothies[0] && processorType > 2 && smoothie_data[0] > 0)
+        {
+            lava_filter(game_screen, VGAScreen);
+            VGAScreen = game_screen;
+        }
 
-        //if (superWild)
-        //{
-        //    neat += 3;
-        //    JE_darkenBackground(neat);
-        //}
+        if (superWild)
+        {
+            neat += 3;
+            JE_darkenBackground(neat);
+        }
 
         /*-----------------------BACKGROUNDS------------------------*/
         /*-----------------------BACKGROUND 2------------------------*/
@@ -911,15 +1390,14 @@ public static class Tyrian2C
             draw_background_3(VGAScreen);
 
 
-        //ED TODO: ENEMY: Uncomment this
         /* New Enemy */
-        //if (enemiesActive && mt_rand() % 100 > levelEnemyFrequency)
-        //{
-        //    tempW = levelEnemy[mt_rand() % levelEnemyMax];
-        //    if (tempW == 2)
-        //        soundQueue[3] = S_WEAPON_7;
-        //    b = JE_newEnemy(0, tempW, 0);
-        //}
+        if (enemiesActive && mt_rand() % 100 > levelEnemyFrequency)
+        {
+            tempW = levelEnemy[mt_rand() % levelEnemyMax];
+            if (tempW == 2)
+                soundQueue[3] = S_WEAPON_7;
+            b = JE_newEnemy(0, tempW, 0);
+        }
 
         if (processorType > 1 && smoothies[3 - 1])
         {
@@ -932,49 +1410,940 @@ public static class Tyrian2C
             VGAScreen = game_screen;
         }
 
-        //ED TODO: ENEMY: Uncomment this
         /* Draw Sky Enemy */
-        //if (!skyEnemyOverAll)
-        //{
-        //    lastEnemyOnScreen = enemyOnScreen;
+        if (!skyEnemyOverAll)
+        {
+            lastEnemyOnScreen = enemyOnScreen;
 
-        //    tempMapXOfs = mapX2Ofs;
-        //    tempBackMove = 0;
-        //    JE_drawEnemy(25);
+            tempMapXOfs = mapX2Ofs;
+            tempBackMove = 0;
+            JE_drawEnemy(25);
 
-        //    if (enemyOnScreen == lastEnemyOnScreen)
-        //    {
-        //        if (stopBackgroundNum == 2)
-        //            stopBackgroundNum = 9;
-        //    }
-        //}
+            if (enemyOnScreen == lastEnemyOnScreen)
+            {
+                if (stopBackgroundNum == 2)
+                    stopBackgroundNum = 9;
+            }
+        }
 
         if (background3over == 0)
             draw_background_3(VGAScreen);
 
-        //ED TODO: ENEMY: Uncomment this
         ///* Draw Top Enemy */
-        //if (!topEnemyOver)
+        if (!topEnemyOver)
+        {
+            tempMapXOfs = (!background3x1) ? oldMapX3Ofs : mapXOfs;
+            tempBackMove = backMove3;
+            JE_drawEnemy(75);
+        }
+
+        /* Player Shot Images */
+        for (int z = 0; z < MAX_PWEAPON; z++)
+        {
+            if (shotAvail[z] != 0)
+            {
+                bool is_special = false;
+                int tempShotX = 0, tempShotY = 0;
+                JE_byte chain;
+                JE_byte playerNum;
+                JE_word tempX2, tempY2;
+                JE_integer damage;
+                JE_byte temp2;
+
+                if (!player_shot_move_and_draw(z, out is_special, out tempShotX, out tempShotY, out damage, out temp2, out chain, out playerNum, out tempX2, out tempY2))
+                {
+                    goto draw_player_shot_loop_end;
+                }
+
+                for (b = 0; b < 100; b++)
+                {
+                    if (enemyAvail[b] == 0)
+                    {
+                        bool collided;
+
+                        if (z == MAX_PWEAPON - 1)
+                        {
+                            temp = 25 - Abs(zinglonDuration - 25);
+                            collided = Abs(enemy[b].ex + enemy[b].mapoffset - (player[0].x + 7)) < temp;
+                            temp2 = 9;
+                            chain = 0;
+                            damage = 10;
+                        }
+                        else if (is_special)
+                        {
+                            collided = ((enemy[b].enemycycle == 0) &&
+                                        (Abs(enemy[b].ex + enemy[b].mapoffset - tempShotX - tempX2) < (25 + tempX2)) &&
+                                        (Abs(enemy[b].ey - tempShotY - 12 - tempY2) < (29 + tempY2))) ||
+                                       ((enemy[b].enemycycle > 0) &&
+                                        (Abs(enemy[b].ex + enemy[b].mapoffset - tempShotX - tempX2) < (13 + tempX2)) &&
+                                        (Abs(enemy[b].ey - tempShotY - 6 - tempY2) < (15 + tempY2)));
+                        }
+                        else
+                        {
+                            collided = ((enemy[b].enemycycle == 0) &&
+                                        (Abs(enemy[b].ex + enemy[b].mapoffset - tempShotX) < 25) && (Abs(enemy[b].ey - tempShotY - 12) < 29)) ||
+                                       ((enemy[b].enemycycle > 0) &&
+                                        (Abs(enemy[b].ex + enemy[b].mapoffset - tempShotX) < 13) && (Abs(enemy[b].ey - tempShotY - 6) < 15));
+                        }
+
+                        if (collided)
+                        {
+                            if (chain > 0)
+                            {
+                                shotMultiPos[SHOT_MISC] = 0;
+                                b = player_shot_create(0, SHOT_MISC, tempShotX, tempShotY, mouseX, mouseY, chain, playerNum);
+                                shotAvail[z] = 0;
+                                goto draw_player_shot_loop_end;
+                            }
+
+                            infiniteShot = false;
+
+                            if (damage == 99)
+                            {
+                                damage = 0;
+                                doIced = 40;
+                                enemy[b].iced = 40;
+                            }
+                            else
+                            {
+                                doIced = 0;
+                                if (damage >= 250)
+                                {
+                                    damage = (short)(damage - 250);
+                                    infiniteShot = true;
+                                }
+                            }
+
+                            int armorleft = enemy[b].armorleft;
+
+                            temp = enemy[b].linknum;
+                            if (temp == 0)
+                                temp = 255;
+
+                            if (enemy[b].armorleft < 255)
+                            {
+                                for (int i = 0; i < boss_bar.Length; i++)
+                                    if (temp == boss_bar[i].link_num)
+                                        boss_bar[i].color = 6;
+
+                                if (enemy[b].enemyground)
+                                    enemy[b].filter = temp2;
+
+                                for (int e = 0; e < enemy.Length; e++)
+                                {
+                                    if (enemy[e].linknum == temp &&
+                                        enemyAvail[e] != 1 &&
+                                        enemy[e].enemyground)
+                                    {
+                                        if (doIced != 0)
+                                            enemy[e].iced = doIced;
+                                        enemy[e].filter = temp2;
+                                    }
+                                }
+                            }
+
+                            if (armorleft > damage)
+                            {
+                                if (z != MAX_PWEAPON - 1)
+                                {
+                                    if (enemy[b].armorleft != 255)
+                                    {
+                                        enemy[b].armorleft -= (byte)damage;
+                                        JE_setupExplosion(tempShotX, tempShotY, 0, 0, false, false);
+                                    }
+                                    else
+                                    {
+                                        JE_doSP(tempShotX + 6, tempShotY + 6, damage / 2 + 3, (byte)(damage / 4 + 2), temp2);
+                                    }
+                                }
+
+                                soundQueue[5] = S_ENEMY_HIT;
+
+                                if ((armorleft - damage <= enemy[b].edlevel) &&
+                                    ((!enemy[b].edamaged) ^ (enemy[b].edani < 0)))
+                                {
+
+                                    for (temp3 = 0; temp3 < 100; temp3++)
+                                    {
+                                        if (enemyAvail[temp3] != 1)
+                                        {
+                                            int linknum = enemy[temp3].linknum;
+                                            if (
+                                                 (temp3 == b) ||
+                                                 (
+                                                   (temp != 255) &&
+                                                   (
+                                                     ((enemy[temp3].edlevel > 0) && (linknum == temp)) ||
+                                                     (
+                                                       (enemyContinualDamage && (temp - 100 == linknum)) ||
+                                                       ((linknum > 40) && (linknum / 20 == temp / 20) && (linknum <= temp))
+                                                     )
+                                                   )
+                                                 )
+                                               )
+                                            {
+                                                enemy[temp3].enemycycle = 1;
+
+                                                enemy[temp3].edamaged = !enemy[temp3].edamaged;
+
+                                                if (enemy[temp3].edani != 0)
+                                                {
+                                                    enemy[temp3].ani = (byte)Abs(enemy[temp3].edani);
+                                                    enemy[temp3].aniactive = 1;
+                                                    enemy[temp3].animax = 0;
+                                                    enemy[temp3].animin = (byte)enemy[temp3].edgr;
+                                                    enemy[temp3].enemycycle = (byte)(enemy[temp3].animin - 1);
+
+                                                }
+                                                else if (enemy[temp3].edgr > 0)
+                                                {
+                                                    enemy[temp3].egr[1 - 1] = enemy[temp3].edgr;
+                                                    enemy[temp3].ani = 1;
+                                                    enemy[temp3].aniactive = 0;
+                                                    enemy[temp3].animax = 0;
+                                                    enemy[temp3].animin = 1;
+                                                }
+                                                else
+                                                {
+                                                    enemyAvail[temp3] = 1;
+                                                    enemyKilled++;
+                                                }
+
+                                                enemy[temp3].aniwhenfire = 0;
+
+                                                if (enemy[temp3].armorleft > (byte)enemy[temp3].edlevel)
+                                                    enemy[temp3].armorleft = (byte)enemy[temp3].edlevel;
+
+                                                tempX = (ushort)(enemy[temp3].ex + enemy[temp3].mapoffset);
+                                                tempY = (ushort)(enemy[temp3].ey);
+
+                                                if (enemyDat[enemy[temp3].enemytype].esize != 1)
+                                                    JE_setupExplosion(tempX, tempY - 6, 0, 1, false, false);
+                                                else
+                                                    JE_setupExplosionLarge(enemy[temp3].enemyground, (byte)(enemy[temp3].explonum / 2), (short)tempX, (short)tempY);
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                            else
+                            {
+
+                                if ((temp == 254) && (superEnemy254Jump > 0))
+                                    JE_eventJump(superEnemy254Jump);
+
+                                for (temp2 = 0; temp2 < 100; temp2++)
+                                {
+                                    if (enemyAvail[temp2] != 1)
+                                    {
+                                        temp3 = enemy[temp2].linknum;
+                                        if ((temp2 == b) || (temp == 254) ||
+                                            ((temp != 255) && ((temp == temp3) || (temp - 100 == temp3)
+                                            || ((temp3 > 40) && (temp3 / 20 == temp / 20) && (temp3 <= temp)))))
+                                        {
+
+                                            int enemy_screen_x = enemy[temp2].ex + enemy[temp2].mapoffset;
+
+                                            if (enemy[temp2].special)
+                                            {
+                                                globalFlags[enemy[temp2].flagnum - 1] = enemy[temp2].setto;
+                                            }
+
+                                            if ((enemy[temp2].enemydie > 0) &&
+                                                !((superArcadeMode != SA_NONE) &&
+                                                  (enemyDat[enemy[temp2].enemydie].value == 30000)))
+                                            {
+                                                int temp_b = b;
+                                                tempW = enemy[temp2].enemydie;
+                                                int enemy_offset = temp2 - (temp2 % 25);
+                                                if (enemyDat[tempW].value > 30000)
+                                                {
+                                                    enemy_offset = 0;
+                                                }
+                                                b = JE_newEnemy(enemy_offset, tempW, 0);
+                                                if (b != 0)
+                                                {
+                                                    if ((superArcadeMode != SA_NONE) && (enemy[b - 1].evalue > 30000))
+                                                    {
+                                                        superArcadePowerUp++;
+                                                        if (superArcadePowerUp > 5)
+                                                            superArcadePowerUp = 1;
+                                                        enemy[b - 1].egr[1 - 1] = (ushort)(5 + superArcadePowerUp * 2);
+                                                        enemy[b - 1].evalue = (short)(30000 + superArcadePowerUp);
+                                                    }
+
+                                                    if (enemy[b - 1].evalue != 0)
+                                                        enemy[b - 1].scoreitem = true;
+                                                    else
+                                                        enemy[b - 1].scoreitem = false;
+
+                                                    enemy[b - 1].ex = enemy[temp2].ex;
+                                                    enemy[b - 1].ey = enemy[temp2].ey;
+                                                }
+                                                b = temp_b;
+                                            }
+
+                                            if ((enemy[temp2].evalue > 0) && (enemy[temp2].evalue < 10000))
+                                            {
+                                                if (enemy[temp2].evalue == 1)
+                                                {
+                                                    cubeMax++;
+                                                }
+                                                else
+                                                {
+                                                    // in galaga mode player 2 is sidekick, so give cash to player 1
+                                                    player[galagaMode ? 0 : playerNum - 1].cash += enemy[temp2].evalue;
+                                                }
+                                            }
+
+                                            if ((enemy[temp2].edlevel == -1) && (temp == temp3))
+                                            {
+                                                enemy[temp2].edlevel = 0;
+                                                enemyAvail[temp2] = 2;
+                                                enemy[temp2].egr[1 - 1] = enemy[temp2].edgr;
+                                                enemy[temp2].ani = 1;
+                                                enemy[temp2].aniactive = 0;
+                                                enemy[temp2].animax = 0;
+                                                enemy[temp2].animin = 1;
+                                                enemy[temp2].edamaged = true;
+                                                enemy[temp2].enemycycle = 1;
+                                            }
+                                            else
+                                            {
+                                                enemyAvail[temp2] = 1;
+                                                enemyKilled++;
+                                            }
+
+                                            if (enemyDat[enemy[temp2].enemytype].esize == 1)
+                                            {
+                                                JE_setupExplosionLarge(enemy[temp2].enemyground, enemy[temp2].explonum, (short)enemy_screen_x, enemy[temp2].ey);
+                                                soundQueue[6] = S_EXPLOSION_9;
+                                            }
+                                            else
+                                            {
+                                                JE_setupExplosion(enemy_screen_x, enemy[temp2].ey, 0, 1, false, false);
+                                                soundQueue[6] = S_SELECT; // S_EXPLOSION_8
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+
+                            if (infiniteShot)
+                            {
+                                damage += 250;
+                            }
+                            else if (z != MAX_PWEAPON - 1)
+                            {
+                                if (damage <= armorleft)
+                                {
+                                    shotAvail[z] = 0;
+                                    goto draw_player_shot_loop_end;
+                                }
+                                else
+                                {
+                                    playerShotData[z].shotDmg -= (byte)armorleft;
+                                }
+                            }
+                        }
+                    }
+                }
+
+            draw_player_shot_loop_end:
+                ;
+            }
+        }
+
+        /* Player movement indicators for shots that track your ship */
+        for (uint i = 0; i < player.Length; ++i)
+        {
+            player[i].last_x_shot_move = player[i].x;
+            player[i].last_y_shot_move = player[i].y;
+        }
+
+        /*=================================*/
+        /*=======Collisions Detection======*/
+        /*=================================*/
+
+        for (uint i = 0; i < (twoPlayerMode ? 2 : 1); ++i)
+            if (player[i].is_alive && !endLevel)
+                JE_playerCollide(player[i], (byte)(i + 1));
+
+        if (firstGameOver)
+            JE_mainGamePlayerFunctions();      /*--------PLAYER DRAW+MOVEMENT---------*/
+
+        if (!endLevel)
+        {    /*MAIN DRAWING IS STOPPED STARTING HERE*/
+
+            /* Draw Enemy Shots */
+            for (int z = 0; z < ENEMY_SHOT_MAX; z++)
+            {
+                if (!enemyShotAvail[z])
+                {
+                    enemyShot[z].sxm += enemyShot[z].sxc;
+                    enemyShot[z].sx += enemyShot[z].sxm;
+
+                    if (enemyShot[z].tx != 0)
+                    {
+                        if (enemyShot[z].sx > player[0].x)
+                        {
+                            if (enemyShot[z].sxm > -enemyShot[z].tx)
+                            {
+                                enemyShot[z].sxm--;
+                            }
+                        }
+                        else
+                        {
+                            if (enemyShot[z].sxm < enemyShot[z].tx)
+                            {
+                                enemyShot[z].sxm++;
+                            }
+                        }
+                    }
+
+                    enemyShot[z].sym += enemyShot[z].syc;
+                    enemyShot[z].sy += enemyShot[z].sym;
+
+                    if (enemyShot[z].ty != 0)
+                    {
+                        if (enemyShot[z].sy > player[0].y)
+                        {
+                            if (enemyShot[z].sym > -enemyShot[z].ty)
+                            {
+                                enemyShot[z].sym--;
+                            }
+                        }
+                        else
+                        {
+                            if (enemyShot[z].sym < enemyShot[z].ty)
+                            {
+                                enemyShot[z].sym++;
+                            }
+                        }
+                    }
+
+                    if (enemyShot[z].duration-- == 0 || enemyShot[z].sy > 190 || enemyShot[z].sy <= -14 || enemyShot[z].sx > 275 || enemyShot[z].sx <= 0)
+                    {
+                        enemyShotAvail[z] = true;
+                    }
+                    else  // check if shot collided with player
+                    {
+                        for (uint i = 0; i < (twoPlayerMode ? 2 : 1); ++i)
+                        {
+                            if (player[i].is_alive &&
+                                enemyShot[z].sx > player[i].x - player[i].shot_hit_area_x &&
+                                enemyShot[z].sx < player[i].x + player[i].shot_hit_area_x &&
+                                enemyShot[z].sy > player[i].y - player[i].shot_hit_area_y &&
+                                enemyShot[z].sy < player[i].y + player[i].shot_hit_area_y)
+                            {
+                                tempX = (ushort)enemyShot[z].sx;
+                                tempY = (ushort)enemyShot[z].sy;
+                                temp = enemyShot[z].sdmg;
+
+                                enemyShotAvail[z] = true;
+
+                                JE_setupExplosion(tempX, tempY, 0, 0, false, false);
+
+                                if (player[i].invulnerable_ticks == 0)
+                                {
+                                    if ((temp = JE_playerDamage(temp, player[i])) > 0)
+                                    {
+                                        player[i].x_velocity += (short)((enemyShot[z].sxm * temp) / 2);
+                                        player[i].y_velocity += (short)((enemyShot[z].sym * temp) / 2);
+                                    }
+                                }
+
+                                break;
+                            }
+                        }
+
+                        if (enemyShotAvail[z] == false)
+                        {
+                            if (enemyShot[z].animax != 0)
+                            {
+                                if (++enemyShot[z].animate >= enemyShot[z].animax)
+                                    enemyShot[z].animate = 0;
+                            }
+
+                            if (enemyShot[z].sgr >= 500)
+                                blit_sprite2(VGAScreen, enemyShot[z].sx, enemyShot[z].sy, shapesW2, enemyShot[z].sgr + enemyShot[z].animate - 500);
+                            else
+                                blit_sprite2(VGAScreen, enemyShot[z].sx, enemyShot[z].sy, shapesC1, enemyShot[z].sgr + enemyShot[z].animate);
+                        }
+                    }
+
+                }
+            }
+        }
+
+        if (background3over == 1)
+            draw_background_3(VGAScreen);
+
+        /* Draw Top Enemy */
+        if (topEnemyOver)
+        {
+            tempMapXOfs = (!background3x1) ? oldMapX3Ofs : oldMapXOfs;
+            tempBackMove = backMove3;
+            JE_drawEnemy(75);
+        }
+
+        /* Draw Sky Enemy */
+        if (skyEnemyOverAll)
+        {
+            lastEnemyOnScreen = enemyOnScreen;
+
+            tempMapXOfs = mapX2Ofs;
+            tempBackMove = 0;
+            JE_drawEnemy(25);
+
+            if (enemyOnScreen == lastEnemyOnScreen)
+            {
+                if (stopBackgroundNum == 2)
+                    stopBackgroundNum = 9;
+            }
+        }
+
+        /*-------------------------- Sequenced Explosions -------------------------*/
+        enemyStillExploding = false;
+        for (int i = 0; i < MAX_REPEATING_EXPLOSIONS; i++)
+        {
+            if (rep_explosions[i].ttl != 0)
+            {
+                enemyStillExploding = true;
+
+                if (rep_explosions[i].delay > 0)
+                {
+                    rep_explosions[i].delay--;
+                    continue;
+                }
+
+                rep_explosions[i].y += (uint)(backMove2 + 1);
+                short x = (short)(rep_explosions[i].x + (mt_rand() % 24) - 12);
+                short y = (short)(rep_explosions[i].y + (mt_rand() % 27) - 24);
+
+                if (rep_explosions[i].big)
+                {
+                    JE_setupExplosionLarge(false, 2, x, y);
+
+                    if (rep_explosions[i].ttl == 1 || mt_rand() % 5 == 1)
+                        soundQueue[7] = S_EXPLOSION_11;
+                    else
+                        soundQueue[6] = S_EXPLOSION_9;
+
+                    rep_explosions[i].delay = 4 + (mt_rand() % 3);
+                }
+                else
+                {
+                    JE_setupExplosion(x, y, 0, 1, false, false);
+
+                    soundQueue[5] = S_EXPLOSION_4;
+
+                    rep_explosions[i].delay = 3;
+                }
+
+                rep_explosions[i].ttl--;
+            }
+        }
+
+        /*---------------------------- Draw Explosions ----------------------------*/
+        for (int j = 0; j < MAX_EXPLOSIONS; j++)
+        {
+            if (explosions[j].ttl != 0)
+            {
+                if (explosions[j].fixed_position != true)
+                {
+                    explosions[j].sprite++;
+                    explosions[j].y += explodeMove;
+                }
+                else if (explosions[j].follow_player == true)
+                {
+                    explosions[j].x += explosionFollowAmountX;
+                    explosions[j].y += explosionFollowAmountY;
+                }
+                explosions[j].y += explosions[j].delta_y;
+                explosions[j].x += explosions[j].delta_x;
+
+                if (explosions[j].y > 200 - 14)
+                {
+                    explosions[j].ttl = 0;
+                }
+                else
+                {
+                    if (explosionTransparent)
+                        blit_sprite2_blend(VGAScreen, explosions[j].x, explosions[j].y, shapes6, explosions[j].sprite + 1);
+                    else
+                        blit_sprite2(VGAScreen, explosions[j].x, explosions[j].y, shapes6, explosions[j].sprite + 1);
+
+                    explosions[j].ttl--;
+                }
+            }
+        }
+
+        if (!portConfigChange)
+            portConfigDone = true;
+
+        /*-----------------------BACKGROUNDS------------------------*/
+        /*-----------------------BACKGROUND 2------------------------*/
+        if (!(smoothies[2 - 1] && processorType < 4) &&
+            !(smoothies[1 - 1] && processorType == 3))
+        {
+            if (background2over == 2)
+            {
+                if (wild && !background2notTransparent)
+                    draw_background_2_blend(VGAScreen);
+                else
+                    draw_background_2(VGAScreen);
+            }
+        }
+
+
+        /*-------------------------Warning---------------------------*/
+        if ((player[0].is_alive && player[0].armor < 6) ||
+            (twoPlayerMode && !galagaMode && player[1].is_alive && player[1].armor < 6))
+        {
+            int armor_amount = (player[0].is_alive && player[0].armor < 6) ? player[0].armor : player[1].armor;
+
+            if (armorShipDelay > 0)
+            {
+                armorShipDelay--;
+            }
+            else
+            {
+                tempW = 560;
+                b = JE_newEnemy(50, tempW, 0);
+                if (b > 0)
+                {
+                    enemy[b - 1].enemydie = (ushort)(560 + (mt_rand() % 3) + 1);
+                    enemy[b - 1].eyc -= (sbyte)(backMove3);
+                    enemy[b - 1].armorleft = 4;
+                }
+                armorShipDelay = 500;
+            }
+
+            if ((player[0].is_alive && player[0].armor < 6 && (!isNetworkGame || thisPlayerNum == 1)) ||
+                (twoPlayerMode && player[1].is_alive && player[1].armor < 6 && (!isNetworkGame || thisPlayerNum == 2)))
+            {
+
+                tempW = (ushort)(armor_amount * 4 + 8);
+                if (warningSoundDelay > tempW)
+                    warningSoundDelay = (byte)tempW;
+
+                if (warningSoundDelay > 1)
+                {
+                    warningSoundDelay--;
+                }
+                else
+                {
+                    soundQueue[7] = S_WARNING;
+                    warningSoundDelay = (byte)tempW;
+                }
+
+                warningCol = (byte)(warningCol + warningColChange);
+                if (warningCol > 113 + (14 - (armor_amount * 2)))
+                {
+                    warningColChange = (sbyte)-warningColChange;
+                    warningCol = (byte)(113 + (14 - (armor_amount * 2)));
+                }
+                else if (warningCol < 113)
+                {
+                    warningColChange = (sbyte)-warningColChange;
+                }
+                fill_rectangle_xy(VGAScreen, 24, 181, 138, 183, warningCol);
+                fill_rectangle_xy(VGAScreen, 175, 181, 287, 183, warningCol);
+                fill_rectangle_xy(VGAScreen, 24, 0, 287, 3, warningCol);
+
+                JE_outText(VGAScreen, 140, 178, "WARNING", 7, (warningCol % 16) / 2);
+
+            }
+        }
+
+        /*------- Random Explosions --------*/
+        if (randomExplosions && mt_rand() % 10 == 1)
+            JE_setupExplosionLarge(false, 20, (short)(mt_rand() % 280), (short)(mt_rand() % 180));
+
+        /*=================================*/
+        /*=======The Sound Routine=========*/
+        /*=================================*/
+        if (firstGameOver)
+        {
+            temp = 0;
+            for (temp2 = 0; temp2 < SFX_CHANNELS; temp2++)
+            {
+                if (soundQueue[temp2] != S_NONE)
+                {
+                    temp = soundQueue[temp2];
+                    if (temp2 == 3)
+                        temp3 = fxPlayVol;
+                    else if (temp == 15)
+                        temp3 = fxPlayVol / 4;
+                    else   /*Lightning*/
+                        temp3 = fxPlayVol / 2;
+
+                    JE_multiSamplePlay(digiFx[temp - 1], fxSize[temp - 1], (byte)temp2, (byte)temp3);
+
+                    soundQueue[temp2] = S_NONE;
+                }
+            }
+        }
+
+        if (returnActive && enemyOnScreen == 0)
+        {
+            JE_eventJump(65535);
+            returnActive = false;
+        }
+
+        ///*-------      DEbug      ---------*/
+        //debugTime = SDL_GetTicks();
+        //tempW = lastmouse_but;
+        //tempX = (ushort)mouse_x;
+        //tempY = (ushort)mouse_y;
+
+        //if (debug)
         //{
-        //    tempMapXOfs = (background3x1 == 0) ? oldMapX3Ofs : mapXOfs;
-        //    tempBackMove = backMove3;
-        //    JE_drawEnemy(75);
+        //    string tempStr = "";
+        //    for (temp = 0; temp < 9; temp++)
+        //    {
+        //        tempStr = tempStr + ((smoothies[temp] ? 1 : 0) + 48);
+        //    }
+        //    buffer = "SM = " + tempStr;
+        //    JE_outText(VGAScreen, 30, 70, buffer, 4, 0);
+
+        //    sprintf(buffer, "Memory left = %d", -1);
+        //    JE_outText(VGAScreen, 30, 80, buffer, 4, 0);
+        //    sprintf(buffer, "Enemies onscreen = %d", enemyOnScreen);
+        //    JE_outText(VGAScreen, 30, 90, buffer, 6, 0);
+
+        //    debugHist = debugHist + abs((JE_longint)debugTime - (JE_longint)lastDebugTime);
+        //    debugHistCount++;
+        //    sprintf(tempStr, "%2.3f", 1000.0f / roundf(debugHist / debugHistCount));
+        //    sprintf(buffer, "X:%d Y:%-5d  %s FPS  %d %d %d %d", (mapX - 1) * 12 + player[0].x, curLoc, tempStr, player[0].x_velocity, player[0].y_velocity, player[0].x, player[0].y);
+        //    JE_outText(VGAScreen, 45, 175, buffer, 15, 3);
+        //    lastDebugTime = debugTime;
         //}
 
 
+        if (displayTime > 0)
+        {
+            displayTime--;
+            JE_outTextAndDarken(VGAScreen, 90, 10, miscText[59], 15, (JE_byte)flash - 8, FONT_SHAPES);
+            flash = (byte)(flash + flashChange);
+            if (flash > 4 || flash == 0)
+                flashChange = (sbyte)-flashChange;
+        }
+
+        /*Pentium Speed Mode?*/
+        if (pentiumMode)
+        {
+            frameCountMax = (ushort)((frameCountMax == 2) ? 3 : 2);
+        }
 
 
+        /*--------  Level Timer    ---------*/
+        if (levelTimer && levelTimerCountdown > 0)
+        {
+            levelTimerCountdown--;
+            if (levelTimerCountdown == 0)
+                JE_eventJump(levelTimerJumpTo);
 
+            if (levelTimerCountdown > 200)
+            {
+                if (levelTimerCountdown % 100 == 0)
+                    soundQueue[7] = S_WARNING;
 
+                if (levelTimerCountdown % 10 == 0)
+                    soundQueue[6] = S_CLICK;
+            }
+            else if (levelTimerCountdown % 20 == 0)
+            {
+                soundQueue[7] = S_WARNING;
+            }
 
+            JE_textShade(VGAScreen, 140, 6, miscText[66], 7, (levelTimerCountdown % 20) / 3, FULL_SHADE);
+            buffer = (levelTimerCountdown / 100.0f).ToString("0.#");
+            JE_dString(VGAScreen, 100, 2, buffer, SMALL_FONT_SHAPES);
+        }
 
-        //ED TODO: Temporary
-        //if (firstGameOver)
-        //    JE_mainGamePlayerFunctions();
-        //ED TODO: More
+        /*GAME OVER*/
+        if (!constantPlay && !constantDie)
+        {
+            if (allPlayersGone)
+            {
+                if (player[0].exploding_ticks > 0 || player[1].exploding_ticks > 0)
+                {
+                    if (galagaMode)
+                        player[1].exploding_ticks = 0;
 
+                    musicFade = true;
+                }
+                else
+                {
+                    if (play_demo || normalBonusLevelCurrent || bonusLevelCurrent)
+                        reallyEndLevel = true;
+                    else
+                        JE_dString(VGAScreen, 120, 60, miscText[21], FONT_SHAPES); // game over
 
+                    set_mouse_position(159, 100);
+                    if (firstGameOver)
+                    {
+                        if (!play_demo)
+                        {
+                            play_song(SONG_GAMEOVER);
+                            set_volume(tyrMusicVolume, fxVolume);
+                        }
+                        firstGameOver = false;
+                    }
 
+                    if (!play_demo)
+                    {
+                        push_joysticks_as_keyboard();
+                        service_SDL_events(true);
+                        if ((newkey || button[0] || button[1] || button[2]) || newmouse)
+                        {
+                            reallyEndLevel = true;
+                        }
+                    }
+
+                    if (isNetworkGame)
+                        reallyEndLevel = true;
+                }
+            }
+        }
+
+        if (play_demo) // input kills demo
+        {
+            push_joysticks_as_keyboard();
+            service_SDL_events(false);
+
+            if (newkey || newmouse)
+            {
+                reallyEndLevel = true;
+
+                stopped_demo = true;
+            }
+        }
+        else // input handling for pausing, menu, cheats
+        {
+            service_SDL_events(false);
+
+            if (newkey)
+            {
+                skipStarShowVGA = false;
+                yield return Run(e_JE_mainKeyboardInput());
+                newkey = false;
+                if (skipStarShowVGA)
+                    goto level_loop;
+            }
+
+            if (pause_pressed)
+            {
+                pause_pressed = false;
+
+                if (isNetworkGame)
+                    pauseRequest = true;
+                else
+                    yield return Run(e_JE_pauseGame());
+            }
+
+            if (ingamemenu_pressed)
+            {
+                ingamemenu_pressed = false;
+
+                if (isNetworkGame)
+                {
+                    inGameMenuRequest = true;
+                }
+                else
+                {
+                    yourInGameMenuRequest = true;
+                    yield return Run(e_JE_doInGameSetup());
+                    skipStarShowVGA = true;
+                }
+            }
+        }
+
+        /*Network Update*/
+#if WITH_NETWORK
+        if (isNetworkGame)
+        {
+            if (!reallyEndLevel)
+            {
+                Uint16 requests = (pauseRequest == true) |
+                                  (inGameMenuRequest == true) << 1 |
+                                  (skipLevelRequest == true) << 2 |
+                                  (nortShipRequest == true) << 3;
+                SDLNet_Write16(requests, &packet_state_out[0]->data[14]);
+
+                SDLNet_Write16(difficultyLevel, &packet_state_out[0]->data[16]);
+                SDLNet_Write16(player[0].x, &packet_state_out[0]->data[18]);
+                SDLNet_Write16(player[1].x, &packet_state_out[0]->data[20]);
+                SDLNet_Write16(player[0].y, &packet_state_out[0]->data[22]);
+                SDLNet_Write16(player[1].y, &packet_state_out[0]->data[24]);
+                SDLNet_Write16(curLoc, &packet_state_out[0]->data[26]);
+
+                network_state_send();
+
+                if (network_state_update())
+                {
+                    assert(SDLNet_Read16(&packet_state_in[0]->data[26]) == SDLNet_Read16(&packet_state_out[network_delay]->data[26]));
+
+                    requests = SDLNet_Read16(&packet_state_in[0]->data[14]) ^ SDLNet_Read16(&packet_state_out[network_delay]->data[14]);
+                    if (requests & 1)
+                    {
+                        JE_pauseGame();
+                    }
+                    if (requests & 2)
+                    {
+                        yourInGameMenuRequest = SDLNet_Read16(&packet_state_out[network_delay]->data[14]) & 2;
+                        JE_doInGameSetup();
+                        yourInGameMenuRequest = false;
+                        if (haltGame)
+                            reallyEndLevel = true;
+                    }
+                    if (requests & 4)
+                    {
+                        levelTimer = true;
+                        levelTimerCountdown = 0;
+                        endLevel = true;
+                        levelEnd = 40;
+                    }
+                    if (requests & 8) // nortship
+                    {
+                        player[0].items.ship = 12;                     // Nort Ship
+                        player[0].items.special = 13;                  // Astral Zone
+                        player[0].items.weapon[FRONT_WEAPON].id = 36;  // NortShip Super Pulse
+                        player[0].items.weapon[REAR_WEAPON].id = 37;   // NortShip Spreader
+                        shipGr = 1;
+                    }
+
+                    for (int i = 0; i < 2; i++)
+                    {
+                        if (SDLNet_Read16(&packet_state_in[0]->data[18 + i * 2]) != SDLNet_Read16(&packet_state_out[network_delay]->data[18 + i * 2]) || SDLNet_Read16(&packet_state_in[0]->data[20 + i * 2]) != SDLNet_Read16(&packet_state_out[network_delay]->data[20 + i * 2]))
+                        {
+                            char temp[64];
+                            sprintf(temp, "Player %d is unsynchronized!", i + 1);
+
+                            JE_textShade(game_screen, 40, 110 + i * 10, temp, 9, 2, FULL_SHADE);
+                        }
+                    }
+                }
+            }
+
+            JE_clearSpecialRequests();
+        }
+#endif
+
+        /** Test **/
+        JE_drawSP();
+
+        /*Filtration*/
+        if (filterActive)
+        {
+            JE_filterScreen((sbyte)levelFilter, (sbyte)levelBrightness);
+        }
+
+        draw_boss_bar();
+
+        JE_inGameDisplays();
 
         VGAScreen = VGAScreenSeg; /* side-effect of game_screen */
 
@@ -2357,6 +3726,20 @@ public static class Tyrian2C
         levelWarningDisplay = false;
     }
 
+    private static int JE_newEnemy(int enemyOffset, ushort eDatI, short uniqueShapeTableI)
+    {
+        for (int i = enemyOffset; i < enemyOffset + 25; ++i)
+        {
+            if (enemyAvail[i] == 1)
+            {
+                enemyAvail[i] = JE_makeEnemy(i, eDatI, uniqueShapeTableI);
+                return i + 1;
+            }
+        }
+
+        return 0;
+    }
+
     private static byte JE_makeEnemy(int enemyIdx, ushort eDatI, short uniqueShapeTableI )
     {
         JE_SingleEnemyType enemy = VarzC.enemy[enemyIdx];
@@ -2461,9 +3844,9 @@ public static class Tyrian2C
 	    enemy.excc = enemyDat[eDatI].xcaccel;
 	    enemy.eycc = enemyDat[eDatI].ycaccel;
 	    enemy.exccw = Abs(enemy.excc);
-    enemy.exccwmax = (byte)enemy.exccw;
+        enemy.exccwmax = (byte)enemy.exccw;
 	    enemy.eyccw = Abs(enemy.eycc);
-    enemy.eyccwmax = (byte)enemy.eyccw;
+        enemy.eyccwmax = (byte)enemy.eyccw;
 	    enemy.exccadd = (short)((enemy.excc > 0) ? 1 : -1);
 	    enemy.eyccadd = (short)((enemy.eycc > 0) ? 1 : -1);
 	    enemy.special = false;

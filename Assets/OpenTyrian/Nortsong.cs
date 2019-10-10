@@ -69,7 +69,7 @@ public static class NortsongC {
         return new WaitForSeconds(target / 1000.0f - Time.time);
     }
 
-    private static uint SDL_GetTicks()
+    public static uint SDL_GetTicks()
     {
         return (uint)(Time.time * 1000);
     }

@@ -121,14 +121,16 @@ public static class KeyboardC
         keydown = false;
         for (int i = 0; i < SupportedKeys.Length; ++i)
         {
-            bool active = Input.GetKey(SupportedKeys[i]);
-            if (active && !keysactive[i])
+            KeyCode k = SupportedKeys[i];
+            int idx = (int)k;
+            bool active = Input.GetKey(k);
+            if (active && !keysactive[idx])
             {
                 newkey = true;
-                lastkey_sym = SupportedKeys[i];
+                lastkey_sym = k;
                 lastkey_char = (char)lastkey_sym;
             }
-            keydown |= keysactive[i] = active;
+            keydown |= keysactive[idx] = active;
         }
         ESCPressed = keysactive[(int)KeyCode.Escape];
     }

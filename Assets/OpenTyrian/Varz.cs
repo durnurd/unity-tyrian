@@ -205,7 +205,7 @@ public static class VarzC
         public int delta_x, delta_y;
         public bool fixed_position;
         public bool follow_player;
-        public uint sprite;
+        public int sprite;
     }
 
     public struct rep_explosion_type {
@@ -454,7 +454,7 @@ public static class VarzC
     public static JE_word shipGr, shipGr2;
     public static byte[] shipGrPtr, shipGr2ptr;
 
-    static readonly int[][] hud_sidekick_y =
+    public static readonly int[][] hud_sidekick_y =
     {
         new[]{  64,  82 }, // one player HUD
 	    new[]{ 108, 126 }, // two player HUD
@@ -1019,7 +1019,7 @@ public static class VarzC
                     {
                         type = 6;
                     }
-                    explosions[i].sprite = (uint)explosion_data[type].sprite;
+                    explosions[i].sprite = explosion_data[type].sprite;
                     explosions[i].ttl = (byte)explosion_data[type].ttl;
                     explosions[i].follow_player = follow_player;
                     explosions[i].fixed_position = fixed_position;

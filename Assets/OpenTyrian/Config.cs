@@ -690,7 +690,7 @@ public static class ConfigC
             background2 = true;
             tyrMusicVolume = fxVolume = 128;
             gammaCorrection = 0;
-            processorType = 6;
+            processorType = 4;
             gameSpeed = 4;
         }
 

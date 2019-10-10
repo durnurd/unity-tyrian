@@ -34,22 +34,6 @@ public static class BackgrndC
     public static JE_boolean anySmoothies;
     public static readonly JE_byte[] smoothie_data = new JE_byte[9]; /* [1..9] */
 
-    public static void unsafeBackgroundWrapping()
-    {
-        if (mapYPos <= BKwrap1)
-        {
-            mapYPos = BKwrap1to;
-        }
-        if (mapY2Pos <= BKwrap2)
-        {
-            mapY2Pos = BKwrap2to;
-        }
-        if (mapY3Pos <= BKwrap3)
-        {
-            mapY3Pos = BKwrap3to;
-        }
-    }
-
     public static void JE_darkenBackground(JE_word neat)  /* wild detail level */
     {
         byte[] s = VGAScreen.pixels; /* screen pointer, 8-bit specific */
@@ -103,24 +87,18 @@ public static class BackgrndC
 
                 int dataIdx = y * 24;
 
-                //if (shape.fill && pixelsIdx + 24 < pixels_ul) {
-                //    System.Array.Copy(data, dataIdx, pixels, pixelsIdx, 24);
-                //    pixelsIdx += 24;
-                //} else
-                {
-                    for (int x = 24; x > 0; x--) {
-                        if (pixelsIdx >= pixels_ul)
-                            return;
+                for (int x = 24; x > 0; x--) {
+                    if (pixelsIdx >= pixels_ul)
+                        return;
 
-                        byte byt = data[dataIdx];
-                        if (pixelsIdx >= pixels_ll && byt != 0)
-                        {
-                            pixels[pixelsIdx] = byt;
-                        }
-
-                        pixelsIdx++;
-                        dataIdx++;
+                    byte byt = data[dataIdx];
+                    if (pixelsIdx >= pixels_ll && byt != 0)
+                    {
+                        pixels[pixelsIdx] = byt;
                     }
+
+                    pixelsIdx++;
+                    dataIdx++;
                 }
             }
 
@@ -270,6 +248,65 @@ public static class BackgrndC
         for (int i = -1; i < 7; i++)
         {
             blit_background_row(surface, mapX3Pos, (i * 28) + backPos3, ref megaData3, mapY3Pos + i + 1, mapIdx);
+        }
+    }
+
+    public static void JE_filterScreen(JE_shortint col, JE_shortint int_)
+    {
+        byte[] s; /* screen pointer, 8-bit specific */
+        int sIdx;
+        int x, y;
+        int temp;
+
+        if (filterFade)
+        {
+            levelBrightness += levelBrightnessChg;
+            if ((filterFadeStart && levelBrightness < -14) || levelBrightness > 14)
+            {
+                levelBrightnessChg = -levelBrightnessChg;
+                filterFadeStart = false;
+                levelFilter = levelFilterNew;
+            }
+            if (!filterFadeStart && levelBrightness == 0)
+            {
+                filterFade = false;
+                levelBrightness = -99;
+            }
+        }
+
+        if (col != -99 && filtrationAvail)
+        {
+            s = VGAScreen.pixels;
+            sIdx = 24;
+
+            col <<= 4;
+
+            for (y = 184; y != 0; y--)
+            {
+                for (x = 264; x != 0; x--)
+                {
+                    s[sIdx] = (byte)((byte)col | (s[sIdx] & 0x0f));
+                    sIdx++;
+                }
+                sIdx += VGAScreen.w - 264;
+            }
+        }
+
+        if (int_ != -99 && explosionTransparent)
+        {
+            s = VGAScreen.pixels;
+            sIdx = 24;
+
+            for (y = 184; y != 0; y--)
+            {
+                for (x = 264; x != 0; x--)
+                {
+                    temp = (s[sIdx] & 0x0f) + int_;
+                    s[sIdx] = (byte)((s[sIdx] & 0xf0) | (temp >= 0x1f ? 0 : (temp >= 0x0f ? 0x0f : temp)));
+                    sIdx++;
+                }
+                sIdx += VGAScreen.w - 264;
+            }
         }
     }
 
