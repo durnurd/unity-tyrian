@@ -3215,7 +3215,7 @@ public static class GameMenuC
         mouseY = (JE_word)player[0].y;
 
         // create shots in weapon simulator
-        for (uint i = 0; i < 2; ++i)
+        for (int i = 0; i < 2; ++i)
         {
             if (shotRepeat[i] > 0)
             {
@@ -3223,11 +3223,11 @@ public static class GameMenuC
             }
             else
             {
-                uint item = player[0].items.weapon[i].id;
+                int item = player[0].items.weapon[i].id;
                 int item_power = player[0].items.weapon[i].power - 1,
                 item_mode = (i == REAR_WEAPON) ? player[0].weapon_mode - 1 : 0;
 
-                b = player_shot_create(item, i, (short)player[0].x, (short)player[0].y, mouseX, mouseY, weaponPort[item].op[item_mode][item_power], 1);
+                b = player_shot_create(item, i, player[0].x, player[0].y, mouseX, mouseY, weaponPort[item].op[item_mode][item_power], 1);
             }
         }
 
@@ -3240,8 +3240,8 @@ public static class GameMenuC
             else
             {
                 uint item = player[0].items.sidekick[LEFT_SIDEKICK];
-                short x = player[0].sidekick[LEFT_SIDEKICK].x,
-                      y = player[0].sidekick[LEFT_SIDEKICK].y;
+                int x = player[0].sidekick[LEFT_SIDEKICK].x,
+                    y = player[0].sidekick[LEFT_SIDEKICK].y;
 
                 b = player_shot_create(options[item].wport, SHOT_LEFT_SIDEKICK, x, y, mouseX, mouseY, options[item].wpnum, 1);
             }
@@ -3267,8 +3267,8 @@ public static class GameMenuC
             else
             {
                 uint item = player[0].items.sidekick[RIGHT_SIDEKICK];
-                short x = player[0].sidekick[RIGHT_SIDEKICK].x,
-                      y = player[0].sidekick[RIGHT_SIDEKICK].y;
+                int x = player[0].sidekick[RIGHT_SIDEKICK].x,
+                    y = player[0].sidekick[RIGHT_SIDEKICK].y;
 
                 b = player_shot_create(options[item].wport, SHOT_RIGHT_SIDEKICK, x, y, mouseX, mouseY, options[item].wpnum, 1);
             }

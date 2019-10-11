@@ -39,7 +39,7 @@ public static class ShotsC
 {
     public class PlayerShotDataType
     {
-        public JE_integer shotX, shotY, shotXM, shotYM, shotXC, shotYC;
+        public int shotX, shotY, shotXM, shotYM, shotXC, shotYC;
         public JE_boolean shotComplicated;
         public JE_integer shotDevX, shotDirX, shotDevY, shotDirY, shotCirSizeX, shotCirSizeY;
         public JE_byte shotTrail;
@@ -144,7 +144,7 @@ public static class ShotsC
     private static readonly JE_word[] linkMult2Gr /* [0..16] */ =
         {78,299,295,297,2,278,276,280,59,279,275,277,40,296,294,298,78};
 
-    public static void player_shot_set_direction(JE_integer shot_id, uint weapon_id, JE_real direction)
+    public static void player_shot_set_direction(int shot_id, uint weapon_id, JE_real direction)
     {
         PlayerShotDataType shot = playerShotData[shot_id];
 
@@ -208,7 +208,7 @@ public static class ShotsC
         {
             shot.shotXM += shot.shotXC;
             shot.shotX += shot.shotXM;
-            JE_integer tmp_shotXM = shot.shotXM;
+            int tmp_shotXM = shot.shotXM;
 
             if (shot.shotXM > 100)
             {
@@ -342,7 +342,7 @@ public static class ShotsC
     }
 
     static readonly JE_byte[] soundChannel /* [1..11] */ = { 0, 2, 4, 4, 2, 2, 5, 5, 1, 4, 1 };
-    public static JE_integer player_shot_create(uint portNum, uint bay_i, int PX, int PY, JE_word mouseX, JE_word mouseY, JE_word wpNum, JE_byte playerNum)
+    public static JE_integer player_shot_create(int portNum, int bay_i, int PX, int PY, JE_word mouseX, JE_word mouseY, int wpNum, JE_byte playerNum)
     {
         // Bounds check
         if (portNum > PORT_NUM || wpNum <= 0 || wpNum > WEAP_NUM)

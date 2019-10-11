@@ -216,8 +216,8 @@ public static class VarzC
     }
 
     public struct superpixel_type {
-        public int x, y, z;
-        public int delta_x, delta_y;
+        public ushort x, y, z;
+        public short delta_x, delta_y;
         public byte color;
     }
 
@@ -417,7 +417,7 @@ public static class VarzC
     public static JE_byte[] enemyShapeTables = new JE_byte[6];
     public static JE_word superEnemy254Jump;
     public static explosion_type[] explosions = new explosion_type[MAX_EXPLOSIONS];
-    public static JE_integer explosionFollowAmountX, explosionFollowAmountY;
+    public static int explosionFollowAmountX, explosionFollowAmountY;
     public static JE_boolean fireButtonHeld;
     public static JE_boolean[] enemyShotAvail = new JE_boolean[ENEMY_SHOT_MAX];
     public static EnemyShotType[] enemyShot = new EnemyShotType[ENEMY_SHOT_MAX];
@@ -434,9 +434,9 @@ public static class VarzC
     public static JE_boolean allPlayersGone;
     public const int shadowYDist = 10;
     public static JE_real optionSatelliteRotate;
-    public static JE_integer optionAttachmentMove;
+    public static int optionAttachmentMove;
     public static JE_boolean optionAttachmentLinked, optionAttachmentReturn;
-    public static JE_byte chargeWait, chargeLevel, chargeMax, chargeGr, chargeGrWait;
+    public static int chargeWait, chargeLevel, chargeMax, chargeGr, chargeGrWait;
     public static JE_word neat;
     public static rep_explosion_type[] rep_explosions = new rep_explosion_type[MAX_REPEATING_EXPLOSIONS];
     public static superpixel_type[] superpixels = new superpixel_type[MAX_SUPERPIXELS];
@@ -752,7 +752,7 @@ public static class VarzC
         }
     }
 
-    public static void JE_doSpecialShot(JE_byte playerNum, ref JE_word armor, ref JE_word shield)
+    public static void JE_doSpecialShot(JE_byte playerNum, ref int armor, ref int shield)
     {
         if (player[0].items.special > 0)
         {
@@ -782,7 +782,7 @@ public static class VarzC
                 if (temp2 < 98)  // costs some shield
                 {
                     if (shield >= temp2)
-                        shield -= (JE_word)temp2;
+                        shield -= temp2;
                     else
                         can_afford = false;
                 }
@@ -796,13 +796,13 @@ public static class VarzC
                 else if (temp2 == 99)  // costs half shield
                 {
                     temp2 = shield / 2;
-                    shield = (JE_word)temp2;
+                    shield = temp2;
                 }
                 else  // costs some armor
                 {
                     temp2 -= 100;
                     if (armor > temp2)
-                        armor -= (JE_word)temp2;
+                        armor -= temp2;
                     else
                         can_afford = false;
                 }
@@ -1213,16 +1213,16 @@ public static class VarzC
     {
         for (temp = 0; temp < num; temp++)
         {
-            JE_real tempr = Random.value * (2 * (float)PI);
-            int tempy = (int)Round(Cos(tempr) * Random.value * explowidth);
-            int tempx = (int)Round(Sin(tempr) * Random.value * explowidth);
+            JE_real tempr = mt_rand() * (2 * (float)PI);
+            int tempy = (int)Round(Cos(tempr) * mt_rand() * explowidth);
+            int tempx = (int)Round(Sin(tempr) * mt_rand() * explowidth);
 
             if (++last_superpixel >= MAX_SUPERPIXELS)
                 last_superpixel = 0;
-            superpixels[last_superpixel].x = tempx + x;
-            superpixels[last_superpixel].y = tempy + y;
-            superpixels[last_superpixel].delta_x = tempx;
-            superpixels[last_superpixel].delta_y = tempy + 1;
+            superpixels[last_superpixel].x = (ushort)(tempx + x);
+            superpixels[last_superpixel].y = (ushort)(tempy + y);
+            superpixels[last_superpixel].delta_x = (short)tempx;
+            superpixels[last_superpixel].delta_y = (short)(tempy + 1);
             superpixels[last_superpixel].color = color;
             superpixels[last_superpixel].z = 15;
         }
@@ -1235,8 +1235,8 @@ public static class VarzC
         {
             if (superpixels[i].z != 0)
             {
-                superpixels[i].x += superpixels[i].delta_x;
-                superpixels[i].y += superpixels[i].delta_y;
+                superpixels[i].x = (ushort)(superpixels[i].x + superpixels[i].delta_x);
+                superpixels[i].y = (ushort)(superpixels[i].y + superpixels[i].delta_y);
 
                 if (superpixels[i].x < VGAScreen.w && superpixels[i].y < VGAScreen.h)
                 {

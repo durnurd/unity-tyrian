@@ -79,13 +79,13 @@ public static class PlayerC
         public int x, y;
         public int[] old_x = new int[20], old_y = new int[20];
 
-        public JE_integer x_velocity, y_velocity;
+        public int x_velocity, y_velocity;
         public JE_word x_friction_ticks, y_friction_ticks;  // ticks until friction is applied
 
-        public JE_integer delta_x_shot_move, delta_y_shot_move;
+        public int delta_x_shot_move, delta_y_shot_move;
 
         public int last_x_shot_move, last_y_shot_move;
-        public JE_integer last_x_explosion_follow, last_y_explosion_follow;
+        public int last_x_explosion_follow, last_y_explosion_follow;
 
 
         public class Sidekick
@@ -96,7 +96,7 @@ public static class PlayerC
             public JE_word style;  // affects movement and size
 
             // state
-            public JE_integer x, y;
+            public int x, y;
             public JE_integer ammo;
             public int ammo_refill_ticks;
 

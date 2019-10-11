@@ -54,12 +54,14 @@ public static class BackgrndC
 
     private static void blit_background_row(Surface surface, int mX, int mY, ref JE_MegaDataType map, int rowIdx, int leftCol)
     {
+        leftCol--;
         byte[] pixels = surface.pixels;
         int pixelsIdx = (mY * surface.w) + mX,
           pixels_ll = 0,  // lower limit
           pixels_ul = (surface.h * surface.w);  // upper limit
 
         byte[] row = map.mainmap[rowIdx];
+        byte[] prevRow = map.mainmap[rowIdx - 1];
         int maxTile = leftCol + 12;
 
         for (int y = 0; y < 28; y++)
@@ -73,7 +75,15 @@ public static class BackgrndC
 
             for (int tileIdx = leftCol; tileIdx < maxTile; tileIdx++)
             {
-                byte shapeIdx = row[tileIdx];
+                byte shapeIdx;
+                if (tileIdx < 0)
+                {
+                    shapeIdx = prevRow[tileIdx + prevRow.Length];
+                }
+                else
+                {
+                    shapeIdx = row[tileIdx];
+                }
 
                 // no tile; skip tile
                 if (shapeIdx >= map.shapes.Length)
@@ -108,12 +118,14 @@ public static class BackgrndC
 
     private static void blit_background_row_blend(Surface surface, int mX, int mY, ref JE_MegaDataType map, int rowIdx, int leftCol)
     {
+        leftCol--;
         byte[] pixels = surface.pixels;
         int pixelsIdx = (mY * surface.w) + mX,
           pixels_ll = 0,  // lower limit
           pixels_ul = (surface.h * surface.w);  // upper limit
 
         byte[] row = map.mainmap[rowIdx];
+        byte[] prevRow = map.mainmap[rowIdx - 1];
         int maxTile = leftCol + 12;
 
         for (int y = 0; y < 28; y++)
@@ -126,7 +138,15 @@ public static class BackgrndC
             }
             for (int tileIdx = leftCol; tileIdx < maxTile; tileIdx++)
             {
-                byte shapeIdx = row[tileIdx];
+                byte shapeIdx;
+                if (tileIdx < 0)
+                {
+                    shapeIdx = prevRow[tileIdx + prevRow.Length];
+                }
+                else
+                {
+                    shapeIdx = row[tileIdx];
+                }
 
                 // no tile; skip tile
                 if (shapeIdx >= map.shapes.Length)
@@ -162,7 +182,7 @@ public static class BackgrndC
     {
         JE_clr256(surface);
 
-        int mapIdx = 0;//ED TODO: mapXbpPos - 12;
+        int mapIdx = mapXbpPos - 12;
 
         for (int i = -1; i < 7; i++) {
             blit_background_row(surface, mapXPos, (i * 28) + backPos, ref megaData1, mapYPos + i + 1, mapIdx);
@@ -179,7 +199,7 @@ public static class BackgrndC
             // water effect combines background 1 and 2 by syncronizing the x coordinate
             int x = smoothies[1] ? mapXPos : mapX2Pos;
 
-            int mapIdx = 0;//ED TODO: (smoothies[1] ? mapXbpPos : mapX2bpPos) - 12;
+            int mapIdx = (smoothies[1] ? mapXbpPos : mapX2bpPos) - 12;
 
             for (int i = -1; i < 7; i++)
             {
@@ -208,7 +228,7 @@ public static class BackgrndC
         if (map2YDelayMax > 1 && backMove2 < 2)
             backMove2 = (byte)((map2YDelay == 1) ? 1 : 0);
 
-        int mapIdx = 0;//ED TODO: mapX2bpPos - 12;
+        int mapIdx = mapX2bpPos - 12;
 
         for (int i = -1; i < 7; i++)
         {
@@ -243,7 +263,7 @@ public static class BackgrndC
         }
 
 
-        int mapIdx = 0; //ED TODO: mapX3bpPos - 12;
+        int mapIdx = mapX3bpPos - 12;
 
         for (int i = -1; i < 7; i++)
         {

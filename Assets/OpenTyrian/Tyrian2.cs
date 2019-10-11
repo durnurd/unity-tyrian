@@ -396,7 +396,7 @@ public static class Tyrian2C
                                 case 251:
                                     ; /* Suck-O-Magnet */
                                     int attractivity = 4 - (Abs(player[0].x - tempX) + Abs(player[0].y - tempY)) / 100;
-                                    player[0].x_velocity += (short)((player[0].x > tempX) ? -attractivity : attractivity);
+                                    player[0].x_velocity += (player[0].x > tempX) ? -attractivity : attractivity;
                                     break;
                                 case 253: /* Left ShortRange Magnet */
                                     if (Abs(player[0].x + 25 - 14 - tempX) < 24 && Abs(player[0].y - tempY) < 28)
@@ -431,7 +431,7 @@ public static class Tyrian2C
                                         {
                                             int repulsivity = 4 - (Abs(player[0].x - tempX) + Abs(player[0].y - tempY)) / 20;
                                             if (repulsivity > 0)
-                                                player[0].x_velocity += (short)((player[0].x > tempX) ? repulsivity : -repulsivity);
+                                                player[0].x_velocity += (player[0].x > tempX) ? repulsivity : -repulsivity;
                                         }
                                     }
                                     break;
@@ -666,23 +666,22 @@ public static class Tyrian2C
             JE_setTimerInt();
         }
 
-        //ED TODO: Demo support
-        //if (play_demo || record_demo)
-        //{
-        //    if (demo_file)
-        //    {
-        //        fclose(demo_file);
-        //        demo_file = NULL;
-        //    }
+        if (play_demo || record_demo)
+        {
+            if (demo_file != null)
+            {
+                demo_file.Close();
+                demo_file = null;
+            }
 
-        //    if (play_demo)
-        //    {
-        //        stop_song();
-        //        fade_black(10);
+            if (play_demo)
+            {
+                stop_song();
+                yield return Run(e_fade_black(10));
 
-        //        wait_noinput(true, true, true);
-        //    }
-        //}
+                yield return coroutine_wait_noinput(true, true, true);
+            }
+        }
 
         difficultyLevel = oldDifficultyLevel;   /*Return difficulty to normal*/
 
@@ -1848,8 +1847,8 @@ public static class Tyrian2C
                                 {
                                     if ((temp = JE_playerDamage(temp, player[i])) > 0)
                                     {
-                                        player[i].x_velocity += (short)((enemyShot[z].sxm * temp) / 2);
-                                        player[i].y_velocity += (short)((enemyShot[z].sym * temp) / 2);
+                                        player[i].x_velocity += (enemyShot[z].sxm * temp) / 2;
+                                        player[i].y_velocity += (enemyShot[z].sym * temp) / 2;
                                     }
                                 }
 
@@ -2614,7 +2613,7 @@ public static class Tyrian2C
                         case 'L':
                             string tmpS = s;
                             str_pop_int(ref tmpS, 9, out nextLevel);
-                            levelName = s.Substring(13, 10);
+                            levelName = s.Substring(13, 9).Trim();
                             tmpS = s;
                             str_pop_int(ref tmpS, 22, out levelSong);
                             if (nextLevel == 0)
@@ -4289,9 +4288,9 @@ public static class Tyrian2C
                 enemiesActive = true;
                 break;
 
-            //case 15: /* Sky Enemy */
-            //    JE_createNewEventEnemy(0, 0, 0);
-            //    break;
+            case 15: /* Sky Enemy */
+                JE_createNewEventEnemy(0, 0, 0);
+                break;
 
             case 16:
                 if (eventRec[eventLoc - 1].eventdat > 9)

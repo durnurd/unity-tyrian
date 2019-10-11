@@ -13,6 +13,8 @@ using static VideoC;
 using UnityEngine;
 using System;
 using System.Linq;
+using System.Collections;
+
 public static class KeyboardC
 {
     public static JE_boolean ESCPressed;
@@ -22,13 +24,8 @@ public static class KeyboardC
     public static int lastmouse_x, lastmouse_y;
 
     public static bool[] mouse_pressed = new bool[4];
-    public static int mouse_x => Mathf.Clamp((int)Input.mousePosition.x, 0, vga_width);
-    public static int mouse_y => Screen.height - Mathf.Clamp((int)Input.mousePosition.y, 0, vga_height);
-
-    public class MouseActiveChecker {
-        public bool this[int idx] => Input.GetMouseButton(idx - 1);
-    }
-
+    public static int mouse_x;// => Mathf.Clamp((int)Input.mousePosition.x, 0, vga_width);
+    public static int mouse_y;// => Screen.height - Mathf.Clamp((int)Input.mousePosition.y, 0, vga_height);
 
     private static readonly KeyCode[] SupportedKeys = Enum.GetValues(typeof(KeyCode)).Cast<KeyCode>().Where(e => e < KeyCode.Mouse0).ToArray();     //Mouse0 is the first entry we don't support
     public static bool[] keysactive = new bool[(int)SupportedKeys.Max() + 1];
@@ -38,10 +35,6 @@ public static class KeyboardC
 
     public static bool input_grab_enabled;
 
-    public static void flush_events_buffer()
-    {
-
-    }
     public static WaitWhile coroutine_wait_input(JE_boolean keyboard, JE_boolean mouse, JE_boolean joystick)
     {
         service_SDL_events(false);
@@ -69,12 +62,47 @@ public static class KeyboardC
         });
     }
 
+    private static Coroutine mouseMotionListener;
+    private static float accumulatedMouseX, accumulatedMouseY;
+    private static bool[] accumulatedMouseDowns = new bool[3];
+    private static bool[] accumulatedMouseUps = new bool[3];
     public static void input_grab(bool enable)
     {
-        //Nah...
-        //input_grab_enabled = enable;
-        //Cursor.visible = !enable;
+        input_grab_enabled = enable;
+        Cursor.visible = !enable;
+        Cursor.lockState = enable ? CursorLockMode.Locked : CursorLockMode.None;
+        if (mouseMotionListener != null)
+        {
+            CoroutineRunner.Instance.StopCoroutine(mouseMotionListener);
+            mouseMotionListener = null;
+        }
+        if (enable)
+            mouseMotionListener = CoroutineRunner.Run(listenForMouseMotion());
     }
+
+    private static IEnumerator listenForMouseMotion()
+    {
+        accumulatedMouseX = 0;
+        accumulatedMouseY = 0;
+        while (true)
+        {
+            accumulatedMouseX += Input.GetAxis("Mouse X");
+            accumulatedMouseY -= Input.GetAxis("Mouse Y");
+            for (int i = 0; i < 3; ++i)
+            {
+                if (Input.GetMouseButtonDown(i))
+                {
+                    accumulatedMouseDowns[i] = true;
+                }
+                else if (Input.GetMouseButtonUp(i))
+                {
+                    accumulatedMouseUps[i] = true;
+                }
+            }
+            yield return null;
+        }
+    }
+
     public static byte JE_mousePosition(out JE_word mouseX, out JE_word mouseY)
     {
         service_SDL_events(false);
@@ -90,8 +118,8 @@ public static class KeyboardC
         {
             //nah...
             //SDL_WarpMouse(x * scalers[scaler].width / vga_width, y * scalers[scaler].height / vga_height);
-            //mouse_x = x;
-            //mouse_y = y;
+            mouse_x = x;
+            mouse_y = y;
         }
     }
 
@@ -100,22 +128,42 @@ public static class KeyboardC
         if (clear_new)
             newkey = newmouse = false;
 
-        lastmouse_x = mouse_x;
-        lastmouse_y = mouse_y;
-
         if (!Application.isFocused)
             input_grab(false);
 
-        mousedown = false;
-        for (byte i = 1; i < 4; ++i)
+        mouse_x += (int)accumulatedMouseX;
+        mouse_y += (int)accumulatedMouseY;
+        mouse_x = Mathf.Clamp(mouse_x, 0, vga_width);
+        mouse_y = Mathf.Clamp(mouse_y, 0, vga_height);
+
+        accumulatedMouseX = 0;
+        accumulatedMouseY = 0;
+
+        for (byte i = 0; i < 3; ++i)
         {
-            bool active = Input.GetMouseButton(i - 1);
-            if (active && !mouse_pressed[i])
+            if (!input_grab_enabled && Input.GetMouseButton(i))
+            {
+                input_grab(true);
+                break;
+            }
+
+            if (accumulatedMouseDowns[i])
             {
                 newmouse = true;
-                lastmouse_but = (byte)(i);
+                lastmouse_x = mouse_x;
+                lastmouse_y = mouse_y;
+                lastmouse_but = (byte)(i + 1);
+                mousedown = true;
+
+                mouse_pressed[i] = true;
+                accumulatedMouseDowns[i] = false;
             }
-            mousedown |= mouse_pressed[i] = Input.GetMouseButton(i - 1);
+            else if (accumulatedMouseUps[i])
+            {
+                mouse_pressed[i] = false;
+                accumulatedMouseUps[i] = false;
+                mousedown = false;
+            }
         }
 
         keydown = false;
@@ -126,6 +174,10 @@ public static class KeyboardC
             bool active = Input.GetKey(k);
             if (active && !keysactive[idx])
             {
+                if (k == KeyCode.F10)
+                {
+                    input_grab(!input_grab_enabled);
+                }
                 newkey = true;
                 lastkey_sym = k;
                 lastkey_char = (char)lastkey_sym;
