@@ -651,6 +651,7 @@ public static class Tyrian2C
 	   the loadmap function. */
 
     start_level:
+        Application.targetFrameRate = 60;
 
         if (galagaMode)
             twoPlayerMode = false;
@@ -1428,7 +1429,7 @@ public static class Tyrian2C
         if (background3over == 0)
             draw_background_3(VGAScreen);
 
-        ///* Draw Top Enemy */
+        /* Draw Top Enemy */
         if (!topEnemyOver)
         {
             tempMapXOfs = (!background3x1) ? oldMapX3Ofs : mapXOfs;
@@ -2965,13 +2966,13 @@ public static class Tyrian2C
                                     {
                                         s = read_encrypted_pascal_string(ep_f);
 
-                                        if (s[0] != '#')
+                                        if (s?.Length > 0 && s[0] != '#')
                                         {
                                             levelWarningText[levelWarningLines] = s;
                                             levelWarningLines++;
                                         }
                                     }
-                                    while (!(s[0] == '#'));
+                                    while (!(s?.Length > 0 && s[0] == '#'));
 
                                     yield return Run(e_JE_displayText());
                                     newkey = false;
@@ -3205,6 +3206,8 @@ public static class Tyrian2C
     public static IEnumerator e_JE_titleScreen(JE_boolean animate, bool[] refQuit)
     { UnityEngine.Debug.Log("e_JE_titleScreen");
         refQuit[0] = false;
+
+        Application.targetFrameRate = 60;
 
 #if TYRIAN2000
         const int menunum = 6;
@@ -3590,10 +3593,10 @@ public static class Tyrian2C
                                     }
                                     fadeIn = true;
                                     break;
-                                //case 1: /* Load game */
-                                //    JE_loadScreen();
-                                //    fadeIn = true;
-                                //    break;
+                                case 1: /* Load game */
+                                    yield return Run(e_JE_loadScreen());
+                                    fadeIn = true;
+                                    break;
                                 //case 2: /* High scores */
                                 //    JE_highScoreScreen();
                                 //    fadeIn = true;
@@ -3602,10 +3605,10 @@ public static class Tyrian2C
                                 //    JE_helpSystem(1);
                                 //    fadeIn = true;
                                 //    break;
-                                //case 4: /* Ordering info, now OpenTyrian menu */
-                                //    opentyrian_menu();
-                                //    fadeIn = true;
-                                //    break;
+                                case 4: /* Ordering info, now OpenTyrian menu */
+                                    yield return Run(e_opentyrian_menu());
+                                    fadeIn = true;
+                                    break;
 #if TYRIAN2000
                                 case 5: /* Quit */
                                     quit = true;

@@ -86,7 +86,7 @@ public static class BackgrndC
                 }
 
                 // no tile; skip tile
-                if (shapeIdx >= map.shapes.Length)
+                if (shapeIdx >= map.shapes.Length || map.shapes[shapeIdx].sh == null)
                 {
                     pixelsIdx += 24;
                     continue;
@@ -149,7 +149,7 @@ public static class BackgrndC
                 }
 
                 // no tile; skip tile
-                if (shapeIdx >= map.shapes.Length)
+                if (shapeIdx >= map.shapes.Length || map.shapes[shapeIdx].sh == null)
                 {
                     pixelsIdx += 24;
                     continue;

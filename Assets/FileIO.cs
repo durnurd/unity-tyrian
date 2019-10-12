@@ -5,7 +5,7 @@ public static class FileIO
 {
     public static byte[] readAllBytes(string filename)
     {
-        string path = Path.Combine(Application.streamingAssetsPath, filename);
+        string path = Path.Combine(Application.streamingAssetsPath, "tyrian21", filename);
         if (File.Exists(path))
             return File.ReadAllBytes(path);
         return null;
@@ -26,7 +26,7 @@ public static class FileIO
 
     public static BinaryReader open(string filename)
     {
-        string path = Path.Combine(Application.streamingAssetsPath, filename);
+        string path = Path.Combine(Application.streamingAssetsPath, "tyrian21", filename);
         if (File.Exists(path))
             return new BinaryReader(File.OpenRead(path));
         return null;
@@ -34,7 +34,7 @@ public static class FileIO
 
     public static bool fileExists(string filename)
     {
-        string path = Path.Combine(Application.streamingAssetsPath, filename);
+        string path = Path.Combine(Application.streamingAssetsPath, "tyrian21", filename);
         return File.Exists(path);
     }
 

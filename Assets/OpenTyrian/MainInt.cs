@@ -620,6 +620,198 @@ void JE_sort(void );
         return cost;
     }
 
+    public static IEnumerator e_JE_loadScreen()
+    {
+        JE_boolean quit;
+        JE_byte sel, screen, min = 0, max = 0;
+        string tempstr;
+        string tempstr2;
+        int len;
+
+        tempstr = null;
+
+        JE_loadCompShapes(out shapes6, '1');  // need arrow sprites
+
+        yield return Run(e_fade_black(10));
+        JE_loadPic(VGAScreen, 2, false);
+        JE_showVGA();
+        yield return Run(e_fade_palette(colors, 10, 0, 255));
+
+        screen = 1;
+        sel = 1;
+        quit = false;
+
+        System.Array.Copy(VGAScreen.pixels, VGAScreen2.pixels, VGAScreen2.pixels.Length);
+
+        do
+        {
+            while (mousedown)
+            {
+                service_SDL_events(false);
+                tempX = (ushort)mouse_x;
+                tempY = (ushort)mouse_y;
+            }
+
+            System.Array.Copy(VGAScreen2.pixels, VGAScreen.pixels, VGAScreen.pixels.Length);
+
+            JE_dString(VGAScreen, JE_fontCenter(miscText[38 + screen - 1], FONT_SHAPES), 5, miscText[38 + screen - 1], FONT_SHAPES);
+
+            switch (screen)
+            {
+                case 1:
+                    min = 1;
+                    max = 12;
+                    break;
+                case 2:
+                    min = 12;
+                    max = 23;
+                    break;
+            }
+
+            /* SYN: Go through text line by line */
+            for (x = min; x <= max; x++)
+            {
+                tempY = (ushort)(30 + (x - min) * 13);
+
+                if (x == max)
+                {
+                    /* Last line is return to main menu, not a save game */
+                    tempstr = miscText[34 - 1];
+
+                    if (x == sel) /* Highlight if selected */
+                    {
+                        temp2 = 254;
+                    }
+                    else
+                    {
+                        temp2 = 250;
+                    }
+                }
+                else
+                {
+                    if (x == sel) /* Highlight if selected */
+                    {
+                        temp2 = 254;
+                    }
+                    else
+                    {
+                        temp2 = 250 - ((saveFiles[x - 1].level == 0) ? 2 : 0);
+                    }
+
+                    if (saveFiles[x - 1].level == 0) /* I think this means the save file is unused */
+                    {
+                        tempstr = miscText[3 - 1];
+                    }
+                    else
+                    {
+                        tempstr = saveFiles[x - 1].name;
+                    }
+                }
+
+                /* Write first column text */
+                JE_textShade(VGAScreen, 10, tempY, tempstr, 13, (temp2 % 16) - 8, FULL_SHADE);
+
+                if (x < max) /* Write additional columns for all but the last row */
+                {
+                    if (saveFiles[x - 1].level == 0)
+                    {
+                        tempstr = "-----"; /* Unused save slot */
+                    }
+                    else
+                    {
+                        tempstr = saveFiles[x - 1].levelName;
+                        tempstr2 = miscTextB[2 - 1] + " " + saveFiles[x - 1].episode;
+                        JE_textShade(VGAScreen, 250, tempY, tempstr2, 5, (temp2 % 16) - 8, FULL_SHADE);
+                    }
+
+                    tempstr2 = miscTextB[3 - 1] + " " + tempstr;
+                    JE_textShade(VGAScreen, 120, tempY, tempstr2, 5, (temp2 % 16) - 8, FULL_SHADE);
+                }
+
+            }
+
+            if (screen == 2)
+            {
+                blit_sprite2x2(VGAScreen, 90, 180, shapes6, 279);
+            }
+            if (screen == 1)
+            {
+                blit_sprite2x2(VGAScreen, 220, 180, shapes6, 281);
+            }
+
+            helpBoxColor = 15;
+            JE_helpBox(VGAScreen, 110, 182, miscText[56 - 1], 25);
+
+            JE_showVGA();
+
+            yield return Run(e_JE_textMenuWait(null, false));
+
+            if (newkey)
+            {
+                switch (lastkey_sym)
+                {
+                    case KeyCode.UpArrow:
+                        sel--;
+                        if (sel < min)
+                        {
+                            sel = max;
+                        }
+                        JE_playSampleNum(S_CURSOR);
+                        break;
+                    case KeyCode.DownArrow:
+                        sel++;
+                        if (sel > max)
+                        {
+                            sel = min;
+                        }
+                        JE_playSampleNum(S_CURSOR);
+                        break;
+                    case KeyCode.LeftArrow:
+                    case KeyCode.RightArrow:
+                        if (screen == 1)
+                        {
+                            screen = 2;
+                            sel += 11;
+                        }
+                        else
+                        {
+                            screen = 1;
+                            sel -= 11;
+                        }
+                        break;
+                    case KeyCode.Return:
+                        if (sel < max)
+                        {
+                            if (saveFiles[sel - 1].level > 0)
+                            {
+                                JE_playSampleNum(S_SELECT);
+                                performSave = false;
+                                yield return Run(e_JE_operation(sel));
+                                quit = true;
+                            }
+                            else
+                            {
+                                JE_playSampleNum(S_CLINK);
+                            }
+                        }
+                        else
+                        {
+                            quit = true;
+                        }
+
+
+                        break;
+                    case KeyCode.Escape:
+                        quit = true;
+                        break;
+                    default:
+                        break;
+                }
+
+            }
+        } while (!quit);
+    }
+
     public static JE_longint JE_getValue(JE_byte itemType, JE_word itemNum)
     {
         int value = 0;
@@ -789,6 +981,8 @@ void JE_sort(void );
 
     public static IEnumerator e_JE_endLevelAni()
     {
+        Application.targetFrameRate = 60;
+
         JE_word x, y;
         JE_byte temp;
         string tempStr;
@@ -1495,7 +1689,7 @@ void JE_sort(void );
             {
                 service_SDL_events(false);
 
-                if (packet_in[0] && SDLNet_Read16(&packet_in[0]->data[0]) == PACKET_GAME_PAUSE)
+                if (packet_in[0] && SDLNet_Read16(&packet_in[0].data[0]) == PACKET_GAME_PAUSE)
                 {
                     network_update();
                     break;
@@ -1536,7 +1730,7 @@ void JE_sort(void );
             {
                 network_check();
 
-                if (packet_in[0] && SDLNet_Read16(&packet_in[0]->data[0]) == PACKET_WAITING)
+                if (packet_in[0] && SDLNet_Read16(&packet_in[0].data[0]) == PACKET_WAITING)
                 {
                     network_check();
 
@@ -3514,7 +3708,7 @@ void JE_sort(void );
             {
                 service_SDL_events(false);
 
-                if (packet_in[0] && SDLNet_Read16(&packet_in[0]->data[0]) == PACKET_GAME_MENU)
+                if (packet_in[0] && SDLNet_Read16(&packet_in[0].data[0]) == PACKET_GAME_MENU)
                 {
                     network_update();
                     break;
@@ -3578,12 +3772,12 @@ void JE_sort(void );
 
                     if (packet_in[0])
                     {
-                        if (SDLNet_Read16(&packet_in[0]->data[0]) == PACKET_WAITING)
+                        if (SDLNet_Read16(&packet_in[0].data[0]) == PACKET_WAITING)
                         {
                             network_check();
                             break;
                         }
-                        else if (SDLNet_Read16(&packet_in[0]->data[0]) == PACKET_GAME_QUIT)
+                        else if (SDLNet_Read16(&packet_in[0].data[0]) == PACKET_GAME_QUIT)
                         {
                             reallyEndLevel = true;
                             playerEndLevel = true;

@@ -480,35 +480,38 @@ public static class ConfigC
     public static void JE_setNewGameSpeed()
     {
         pentiumMode = false;
+        Application.targetFrameRate = 30;
 
         switch (fastPlay)
         {
-            case 0:
+            case 0: //Normal
                 speed = 0x4300;
                 smoothScroll = true;
                 frameCountMax = 2;
                 break;
-            case 1:
+            case 1: //Turbo
+                Application.targetFrameRate = 100;
                 speed = 0x3000;
                 smoothScroll = true;
                 frameCountMax = 2;
                 break;
-            case 2:
+            case 2: //HYPER SPEED
+                Application.targetFrameRate = 999;
                 speed = 0x2000;
                 smoothScroll = false;
                 frameCountMax = 2;
                 break;
-            case 3:
+            case 3: //Slug Mode
                 speed = 0x5300;
                 smoothScroll = true;
                 frameCountMax = 4;
                 break;
-            case 4:
+            case 4: //Slower
                 speed = 0x4300;
                 smoothScroll = true;
                 frameCountMax = 3;
                 break;
-            case 5:
+            case 5: //Slow
                 speed = 0x4300;
                 smoothScroll = true;
                 frameCountMax = 2;
@@ -877,7 +880,7 @@ public static class ConfigC
 
         JE_encryptSaveTemp();
 
-        writeAllDataBytes("tyrian,sav", saveTemp);
+        writeAllDataBytes("tyrian.sav", saveTemp);
 
         JE_decryptSaveTemp();
 

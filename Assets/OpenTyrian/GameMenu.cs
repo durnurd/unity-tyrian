@@ -365,8 +365,8 @@ public static class GameMenuC
             {
                 planetAni = 0;
                 keyboardUsed = false;
-                currentDotNum = 0;
-                currentDotWait = 8;
+                currentDotNum = 1;
+                currentDotWait = 5;
                 planetAniWait = 3;
                 JE_updateNavScreen();
             }
@@ -2069,7 +2069,7 @@ public static class GameMenuC
         {
             if (currentDotNum < planetDots[curSel[3] - 2])
                 currentDotNum++;
-            currentDotWait = 5;
+            currentDotWait = 2;
         }
     }
 

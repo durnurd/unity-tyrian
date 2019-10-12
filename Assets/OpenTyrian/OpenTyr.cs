@@ -243,6 +243,9 @@ public const string opentyrian_str = "OpenTyrian",
 
     public static IEnumerator e_main(int argc, string[] argv)
     { UnityEngine.Debug.Log("e_main");
+        QualitySettings.vSyncCount = 0;
+        Application.targetFrameRate = 60;
+
         //mt_srand(time(NULL));
 
         //printf("\nWelcome to... >> %s %s <<\n\n", opentyrian_str, opentyrian_version);

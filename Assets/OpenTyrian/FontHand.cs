@@ -241,6 +241,9 @@ public static class FontHandC
     }
     public static void JE_outTextAndDarken(Surface screen, int x, int y, string s, int colorbankI, int brightnessI, ushort font)
     {
+        if (s == null)
+            return;
+
         byte colorbank = (byte)colorbankI;
         sbyte brightness = (sbyte)brightnessI;
         int bright = 0;

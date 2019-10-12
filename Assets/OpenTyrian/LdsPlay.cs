@@ -93,7 +93,9 @@ public static class LdsPlayC
     private static ushort numpatch, numposi, mainvolume;
 
 
-    public static bool playing, songlooped;
+    //public static bool playing, songlooped;
+    public static bool playing => LoudnessC.SongPlayer.isPlaying;
+    public static bool songlooped;
 
     public const float REFRESH = 70.0f;
 
@@ -136,7 +138,8 @@ public static class LdsPlayC
                     fadeonoff = 0;
                     if (hardfade != 0)
                     {
-                        playing = false;
+                        //ED TODO: Music support
+                        //playing = false;
                         hardfade = 0;
                         for (i = 0; i < 9; i++)
                         {
@@ -215,7 +218,8 @@ public static class LdsPlayC
                                         break;
 
                                     case 0xfc:
-                                        playing = false;
+                                        //ED TODO: Music support
+                                        //playing = false;
                                         /* in real player there's also full keyoff here, but we don't need it */
                                         break;
 
@@ -686,7 +690,8 @@ public static class LdsPlayC
     {
         /* init all with 0 */
         tempo_now = 3;
-        playing = true; songlooped = false;
+        //ED TODO: Music support
+        //playing = true; songlooped = false;
         jumping = fadeonoff = allvolume = hardfade = pattplay = 0;
         posplay = jumppos = mainvolume = 0;
         channel = new Channel[channel.Length];
