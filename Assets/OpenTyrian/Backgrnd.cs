@@ -276,7 +276,7 @@ public static class BackgrndC
         byte[] s; /* screen pointer, 8-bit specific */
         int sIdx;
         int x, y;
-        int temp;
+        ushort temp;
 
         if (filterFade)
         {
@@ -321,7 +321,7 @@ public static class BackgrndC
             {
                 for (x = 264; x != 0; x--)
                 {
-                    temp = (s[sIdx] & 0x0f) + int_;
+                    temp = (ushort)((s[sIdx] & 0x0f) + int_);
                     s[sIdx] = (byte)((s[sIdx] & 0xf0) | (temp >= 0x1f ? 0 : (temp >= 0x0f ? 0x0f : temp)));
                     sIdx++;
                 }

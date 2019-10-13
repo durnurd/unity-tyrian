@@ -78,7 +78,13 @@ public static class EditShipC {
             correct = false;
 
         if (!correct)
+        {
+#if UNITY_EDITOR
             UnityEditor.EditorApplication.isPaused = true;
+#else
+            Application.Quit();
+#endif
+        }
 
         extraShips = s2;
     }

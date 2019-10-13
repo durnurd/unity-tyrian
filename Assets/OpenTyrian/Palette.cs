@@ -89,9 +89,9 @@ class PaletteC
     {
         for (int i = first_color; i <= last_color; i++)
         {
-            diff[i][0] = (int)colors[i].r - palette[i].r;
-            diff[i][1] = (int)colors[i].g - palette[i].g;
-            diff[i][2] = (int)colors[i].b - palette[i].b;
+            diff[i][0] = (int)colors[i].r - (int)palette[i].r;
+            diff[i][1] = (int)colors[i].g - (int)palette[i].g;
+            diff[i][2] = (int)colors[i].b - (int)palette[i].b;
         }
     }
 

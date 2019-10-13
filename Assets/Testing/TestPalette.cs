@@ -1,24 +1,36 @@
 ﻿using UnityEngine;
 
-using System.Linq;
-
 using static VideoC;
 using static OpenTyrC;
+using static LoudnessC;
+using static ParamsC;
+using static XmasC;
+using UnityEngine.Serialization;
 
 public class TestPalette : MonoBehaviour
 {
     public Material TargetMaterial;
 
-    public AudioClip[] Songs;
-    public bool[] Loops;
+    [FormerlySerializedAs("Songs")]
+    [SerializeField]
+    private Song[] _songs;
 
-    public AudioSource Player;
-
+    public bool RichMode;
+    public bool ConstantPlay;
+    public bool ConstantDie;
+    public bool Xmas;
+    
     void Start()
     {
-        LoudnessC.Songs = Songs;
-        LoudnessC.Loops = Loops;
-        LoudnessC.SongPlayer = Player;
+        richMode = RichMode;
+        constantPlay = ConstantPlay;
+        constantDie = ConstantDie;
+        xmasOverride = Xmas;
+
+        Songs = _songs;
+        IntroPlayer = new GameObject("Intro Player").AddComponent<AudioSource>();
+        LoopPlayer = new GameObject("Loop Player").AddComponent<AudioSource>();
+        LoopPlayer.loop = true;
 
         AudioSource[] channels = new AudioSource[8];
         for (int i = 0; i < channels.Length; ++i)

@@ -44,9 +44,9 @@ public static class LoudnessC
 
     private const int freq = 44100;
 
-    public static AudioClip[] Songs;
-    public static bool[] Loops;
-    public static AudioSource SongPlayer;
+    public static Song[] Songs;
+    public static AudioSource IntroPlayer;
+    public static AudioSource LoopPlayer;
     public static AudioSource[] SampleChannels;
 
     public static bool init_audio()
@@ -185,10 +185,21 @@ public static class LoudnessC
         {
             load_song(song_num);
             song_playing = song_num;
+            IntroPlayer.Stop();
+            LoopPlayer.Stop();
 
-            SongPlayer.clip = Songs[song_num];
-            SongPlayer.loop = Loops[song_num];
-            SongPlayer.Play();
+            if (Songs[song_num].Intro) {
+                IntroPlayer.clip = Songs[song_num].Intro;
+                if (Songs[song_num].Loop)
+                {
+                    LoopPlayer.clip = Songs[song_num].Loop;
+                    LoopPlayer.PlayScheduled(AudioSettings.dspTime + IntroPlayer.clip.length);
+                }
+                IntroPlayer.Play();
+            } else if (Songs[song_num].Loop) {
+                LoopPlayer.clip = Songs[song_num].Loop;
+                LoopPlayer.Play();
+            }
         }
 
         music_stopped = false;
@@ -203,7 +214,8 @@ public static class LoudnessC
 
     public static void stop_song()
     {
-        SongPlayer.Stop();
+        IntroPlayer.Stop();
+        LoopPlayer.Stop();
 
         music_stopped = true;
     }
@@ -215,7 +227,7 @@ public static class LoudnessC
 
     public static void set_volume(int music, int sample)
     {
-        SongPlayer.volume = music * (1.5f / 255.0f);
+        LoopPlayer.volume = IntroPlayer.volume = music * (1.5f / 255.0f);
         music_volume = music * (1.5f / 255.0f);
         sample_volume = sample * (1.0f / 255.0f);
     }

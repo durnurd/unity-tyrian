@@ -152,15 +152,15 @@ const int SPRITES_PER_TABLE_MAX = 151;
                                 color = h | ((data[dataIdx] & 0x0f) + v);
                                 break;
                             case 3: //blit_sprite_hv
-                                int temp_value = (data[dataIdx] & 0x0f) + v;
+                                byte temp_value = (byte)((data[dataIdx] & 0x0f) + v);
                                 if (temp_value > 0xf)
-                                    temp_value = (temp_value >= 0x1f) ? 0x0 : 0xf;
+                                    temp_value = (byte)((temp_value >= 0x1f) ? 0x0 : 0xf);
                                 color = h | temp_value;
                                 break;
                             case 4: //blit_sprite_hv_blend
-                                temp_value = (data[dataIdx] & 0x0f) + v;
+                                temp_value = (byte)((data[dataIdx] & 0x0f) + v);
                                 if (temp_value > 0xf)
-                                    temp_value = (temp_value >= 0x1f) ? 0x0 : 0xf;
+                                    temp_value = (byte)((temp_value >= 0x1f) ? 0x0 : 0xf);
 
                                 color = h| (((pixels[pixelIdx] & 0x0f) + temp_value) / 2);
                                 break;

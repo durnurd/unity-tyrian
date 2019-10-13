@@ -94,7 +94,7 @@ public static class LdsPlayC
 
 
     //public static bool playing, songlooped;
-    public static bool playing => LoudnessC.SongPlayer.isPlaying;
+    public static bool playing => LoudnessC.IntroPlayer.isPlaying || LoudnessC.LoopPlayer.isPlaying;
     public static bool songlooped;
 
     public const float REFRESH = 70.0f;

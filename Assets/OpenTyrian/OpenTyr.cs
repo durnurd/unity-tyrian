@@ -282,10 +282,15 @@ public const string opentyrian_str = "OpenTyrian",
         JE_loadPals();
         JE_loadMainShapeTables(xmas ? "tyrianc.shp" : "tyrian.shp");
 
-        if (xmas && !xmas_prompt())
+        if (xmas)
         {
-            xmas = false;
-            JE_loadMainShapeTables("tyrian.shp");
+            bool[] outXmas = new bool[1];
+            yield return Run(e_xmas_prompt(outXmas));
+            if (!outXmas[0])
+            {
+                xmas = outXmas[0];
+                JE_loadMainShapeTables("tyrian.shp");
+            }
         }
 
 
