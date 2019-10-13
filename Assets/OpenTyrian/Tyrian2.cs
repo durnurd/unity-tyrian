@@ -3597,14 +3597,14 @@ public static class Tyrian2C
                                     yield return Run(e_JE_loadScreen());
                                     fadeIn = true;
                                     break;
-                                //case 2: /* High scores */
-                                //    JE_highScoreScreen();
-                                //    fadeIn = true;
-                                //    break;
-                                //case 3: /* Instructions */
-                                //    JE_helpSystem(1);
-                                //    fadeIn = true;
-                                //    break;
+                                case 2: /* High scores */
+                                    yield return Run(e_JE_highScoreScreen());
+                                    fadeIn = true;
+                                    break;
+                                case 3: /* Instructions */
+                                    yield return Run(e_JE_helpSystem(1));
+                                    fadeIn = true;
+                                    break;
                                 case 4: /* Ordering info, now OpenTyrian menu */
                                     yield return Run(e_opentyrian_menu());
                                     fadeIn = true;

@@ -461,32 +461,32 @@ public static class GameMenuC
             }
 
             /* keyboard settings menu */
-            //if (curMenu == 5)
-            //{
-            //    for (int x = 2; x <= 11; x++)
-            //    {
-            //        if (x == curSel[curMenu])
-            //        {
-            //            temp2 = 15;
-            //            if (keyboardUsed)
-            //                set_mouse_position(305, 38 + (x - 2) * 12);
-            //        }
-            //        else
-            //        {
-            //            temp2 = 28;
-            //        }
+            if (curMenu == 5)
+            {
+                for (int x = 2; x <= 11; x++)
+                {
+                    if (x == curSel[curMenu])
+                    {
+                        temp2 = 15;
+                        if (keyboardUsed)
+                            set_mouse_position(305, 38 + (x - 2) * 12);
+                    }
+                    else
+                    {
+                        temp2 = 28;
+                    }
 
-            //        JE_textShade(VGAScreen, 166, 38 + (x - 2) * 12, menuInt[curMenu + 1][x - 1], temp2 / 16, temp2 % 16 - 8, DARKEN);
+                    JE_textShade(VGAScreen, 166, 38 + (x - 2) * 12, menuInt[curMenu + 1][x - 1], temp2 / 16, temp2 % 16 - 8, DARKEN);
 
-            //        if (x < 10) /* 10 = reset to defaults, 11 = done */
-            //        {
-            //            temp2 = (x == curSel[curMenu]) ? 252 : 250;
-            //            JE_textShade(VGAScreen, 236, 38 + (x - 2) * 12, SDL_GetKeyName(keySettings[x - 2]), temp2 / 16, temp2 % 16 - 8, DARKEN);
-            //        }
-            //    }
+                    if (x < 10) /* 10 = reset to defaults, 11 = done */
+                    {
+                        temp2 = (x == curSel[curMenu]) ? 252 : 250;
+                        JE_textShade(VGAScreen, 236, 38 + (x - 2) * 12, keySettings[x - 2].ToString(), temp2 / 16, temp2 % 16 - 8, DARKEN);
+                    }
+                }
 
-            //    menuChoices[5] = 11;
-            //}
+                menuChoices[5] = 11;
+            }
 
             /* Joystick settings menu */
             //if (curMenu == 12)
@@ -2704,78 +2704,78 @@ public static class GameMenuC
                 }
                 break;
 
-            //case 5: /* keyboard settings */
-            //    if (curSelect == 10) /* reset to defaults */
-            //    {
-            //        memcpy(keySettings, defaultKeySettings, sizeof(keySettings));
-            //    }
-            //    else if (curSelect == 11) /* done */
-            //    {
-            //        if (isNetworkGame || onePlayerAction)
-            //        {
-            //            curMenu = 11;
-            //        }
-            //        else
-            //        {
-            //            curMenu = 2;
-            //        }
-            //    }
-            //    else /* change key */
-            //    {
-            //        temp2 = 254;
-            //        int tempY = 38 + (curSelect - 2) * 12;
-            //        JE_textShade(VGAScreen, 236, tempY, SDL_GetKeyName(keySettings[curSelect - 2]), (temp2 / 16), (temp2 % 16) - 8, DARKEN);
-            //        JE_showVGA();
+            case 5: /* keyboard settings */
+                if (curSelect == 10) /* reset to defaults */
+                {
+                    System.Array.Copy(defaultKeySettings, keySettings, keySettings.Length);
+                }
+                else if (curSelect == 11) /* done */
+                {
+                    if (isNetworkGame || onePlayerAction)
+                    {
+                        curMenu = 11;
+                    }
+                    else
+                    {
+                        curMenu = 2;
+                    }
+                }
+                else /* change key */
+                {
+                    temp2 = 254;
+                    int tempY = 38 + (curSelect - 2) * 12;
+                    JE_textShade(VGAScreen, 236, tempY, keySettings[curSelect - 2].ToString(), (temp2 / 16), (temp2 % 16) - 8, DARKEN);
+                    JE_showVGA();
 
-            //        wait_noinput(true, true, true);
+                    yield return coroutine_wait_noinput(true, true, true);
 
-            //        col = 248;
-            //        colC = 1;
+                    col = 248;
+                    colC = 1;
 
-            //        do
-            //        {
-            //            setjasondelay(1);
+                    do
+                    {
+                        setjasondelay(1);
 
-            //            col += colC;
-            //            if (col < 243 || col > 248)
-            //            {
-            //                colC *= -1;
-            //            }
-            //            JE_rectangle(VGAScreen, 230, tempY - 2, 300, tempY + 7, col);
+                        col += colC;
+                        if (col < 243 || col > 248)
+                        {
+                            colC *= -1;
+                        }
+                        JE_rectangle(VGAScreen, 230, tempY - 2, 300, tempY + 7, (byte)col);
 
-            //            poll_joysticks();
-            //            service_SDL_events(true);
+                        poll_joysticks();
+                        service_SDL_events(true);
 
-            //            JE_showVGA();
+                        JE_showVGA();
 
-            //            wait_delay();
-            //        } while (!newkey && !mousedown && !joydown);
+                        yield return coroutine_wait_delay();
+                    } while (!newkey && !mousedown && !joydown);
 
-            //        if (newkey)
-            //        {
-            //            // already used? then swap
-            //            for (uint i = 0; i < COUNTOF(keySettings); ++i)
-            //            {
-            //                if (keySettings[i] == lastkey_sym)
-            //                {
-            //                    keySettings[i] = keySettings[curSelect - 2];
-            //                    break;
-            //                }
-            //            }
+                    if (newkey)
+                    {
+                        // already used? then swap
+                        for (uint i = 0; i < keySettings.Length; ++i)
+                        {
+                            if (keySettings[i] == lastkey_sym)
+                            {
+                                keySettings[i] = keySettings[curSelect - 2];
+                                break;
+                            }
+                        }
 
-            //            if (lastkey_sym != SDLK_ESCAPE && // reserved for menu
-            //                lastkey_sym != SDLK_F11 &&    // reserved for gamma
-            //                lastkey_sym != SDLK_p)        // reserved for pause
-            //            {
-            //                JE_playSampleNum(S_CLICK);
-            //                keySettings[curSelect - 2] = lastkey_sym;
-            //                ++curSelect;
-            //            }
+                        if (lastkey_sym != KeyCode.Escape && // reserved for menu
+                            lastkey_sym != KeyCode.F11 &&    // reserved for gamma
+                            lastkey_sym != KeyCode.P)        // reserved for pause
+                        {
+                            JE_playSampleNum(S_CLICK);
+                            keySettings[curSelect - 2] = lastkey_sym;
+                            ++curSelect;
+                        }
 
-            //            JE_wipeKey();
-            //        }
-            //    }
-            //    break;
+                        JE_wipeKey();
+                    }
+                }
+                break;
 
             case 6: //save
                 if (curSelect == 13)

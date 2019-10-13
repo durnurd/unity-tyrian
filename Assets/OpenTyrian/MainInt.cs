@@ -321,10 +321,7 @@ public static class MainIntC
 
         }
     }
-    /*
-void JE_sort(void );
 
-*/
     public static IEnumerator e_JE_helpSystem(JE_byte startTopic)
     { UnityEngine.Debug.Log("e_JE_helpSystem");
         JE_integer page, lastPage = 0;
@@ -385,7 +382,7 @@ void JE_sort(void );
 
                     do
                     {
-                        for (temp = 1; temp <= TOPICS; temp++)
+                        for (temp = 1; temp < TOPICS; temp++)
                         {
                             string buf;
 
@@ -3452,37 +3449,166 @@ void JE_sort(void );
         }
     }
 
+    public static IEnumerator e_JE_highScoreScreen()
+    {
+        int min = 1;
+        int max = 3;
+
+        int z;
+        string scoretemp;
+
+        JE_loadCompShapes(out shapes6, '1');  // need arrow sprites
+
+        yield return Run(e_fade_black(10));
+        JE_loadPic(VGAScreen, 2, false);
+        JE_showVGA();
+        yield return Run(e_fade_palette(colors, 10, 0, 255));
+
+        bool quit = false;
+        int x = 1;
+        int chg = 1;
+
+        System.Array.Copy(VGAScreen.pixels, VGAScreen2.pixels, VGAScreen2.pixels.Length);
+
+        do
+        {
+            if (episodeAvail[x - 1])
+            {
+                System.Array.Copy(VGAScreen2.pixels, VGAScreen.pixels, VGAScreen.pixels.Length);
+
+                JE_dString(VGAScreen, JE_fontCenter(miscText[51 - 1], FONT_SHAPES), 03, miscText[51 - 1], FONT_SHAPES);
+                JE_dString(VGAScreen, JE_fontCenter(episode_name[x], SMALL_FONT_SHAPES), 30, episode_name[x], SMALL_FONT_SHAPES);
+
+                /* Player 1 */
+                temp = (x * 6) - 6;
+
+                JE_dString(VGAScreen, JE_fontCenter(miscText[47 - 1], SMALL_FONT_SHAPES), 55, miscText[47 - 1], SMALL_FONT_SHAPES);
+
+                for (z = 0; z < 3; z++)
+                {
+                    int difficulty = saveFiles[temp + z].highScoreDiff;
+                    if (difficulty > 9)
+                    {
+                        saveFiles[temp + z].highScoreDiff = 0;
+                        difficulty = 0;
+                    }
+                    scoretemp = "~#" + (z + 1) + ":~ " + saveFiles[temp + z].highScore1;
+                    JE_textShade(VGAScreen, 250, ((z + 1) * 10) + 65, difficultyNameB[difficulty], 15, difficulty + (difficulty == 0 ? 0 : -1), FULL_SHADE);
+                    JE_textShade(VGAScreen, 20, ((z + 1) * 10) + 65, scoretemp, 15, 0, FULL_SHADE);
+                    JE_textShade(VGAScreen, 110, ((z + 1) * 10) + 65, saveFiles[temp + z].highScoreName, 15, 2, FULL_SHADE);
+                }
+
+                /* Player 2 */
+                temp += 3;
+
+                JE_dString(VGAScreen, JE_fontCenter(miscText[48 - 1], SMALL_FONT_SHAPES), 120, miscText[48 - 1], SMALL_FONT_SHAPES);
+
+                /*{        textshade(20,125,misctext[49],15,3,_FullShade);
+                  textshade(80,125,misctext[50],15,3,_FullShade);}*/
+
+                for (z = 0; z < 3; z++)
+                {
+                    int difficulty = saveFiles[temp + z].highScoreDiff;
+                    if (difficulty > 9)
+                    {
+                        saveFiles[temp + z].highScoreDiff = 0;
+                        difficulty = 0;
+                    }
+                    scoretemp = "~#" + (z + 1) + ":~ " + saveFiles[temp + z].highScore1; /* Not .highScore2 for some reason */
+                    JE_textShade(VGAScreen, 250, ((z + 1) * 10) + 125, difficultyNameB[difficulty], 15, difficulty + (difficulty == 0 ? 0 : -1), FULL_SHADE);
+                    JE_textShade(VGAScreen, 20, ((z + 1) * 10) + 125, scoretemp, 15, 0, FULL_SHADE);
+                    JE_textShade(VGAScreen, 110, ((z + 1) * 10) + 125, saveFiles[temp + z].highScoreName, 15, 2, FULL_SHADE);
+                }
+
+                if (x > 1)
+                {
+                    blit_sprite2x2(VGAScreen, 90, 180, shapes6, 279);
+                }
+
+                if (((x < 2) && episodeAvail[2 - 1]) || ((x < 3) && episodeAvail[3 - 1]))
+                {
+                    blit_sprite2x2(VGAScreen, 220, 180, shapes6, 281);
+                }
+
+                helpBoxColor = 15;
+                JE_helpBox(VGAScreen, 110, 182, miscText[57 - 1], 25);
+
+                /* {Dstring(fontcenter(misctext[57],_SmallFontShapes),190,misctext[57],_SmallFontShapes);} */
+
+                JE_showVGA();
+
+                yield return Run(e_JE_textMenuWait(null, false));
+
+                if (newkey)
+                {
+                    switch (lastkey_sym)
+                    {
+                        case KeyCode.LeftArrow:
+                            x--;
+                            chg = -1;
+                            break;
+                        case KeyCode.RightArrow:
+                            x++;
+                            chg = 1;
+                            break;
+                        default:
+                            break;
+                    }
+                }
+
+            }
+            else
+            {
+                x += chg;
+            }
+
+            x = (x < min) ? max : (x > max) ? min : x;
+
+            if (newkey)
+            {
+                switch (lastkey_sym)
+                {
+                    case KeyCode.Return:
+                    case KeyCode.Escape:
+                        quit = true;
+                        break;
+                    default:
+                        break;
+                }
+            }
+
+        } while (!quit);
+
+    }
+
     private static void JE_sort()
     {
-        //Maybe another time...
+        int a, b;
 
+        for (a = 0; a < 2; a++)
+        {
+            for (b = a + 1; b < 3; b++)
+            {
+                if (saveFiles[temp + a].highScore1 < saveFiles[temp + b].highScore1)
+                {
+                    JE_longint tempLI;
+                    string tempStr;
+                    JE_byte tempByte;
 
-        //int a, b;
+                    tempLI = saveFiles[temp + a].highScore1;
+                    saveFiles[temp + a].highScore1 = saveFiles[temp + b].highScore1;
+                    saveFiles[temp + b].highScore1 = tempLI;
 
-        //for (a = 0; a < 2; a++)
-        //{
-        //    for (b = a + 1; b < 3; b++)
-        //    {
-        //        if (saveFiles[temp + a].highScore1 < saveFiles[temp + b].highScore1)
-        //        {
-        //            JE_longint tempLI;
-        //            string tempStr;
-        //            JE_byte tempByte;
+                    tempStr = saveFiles[temp + a].highScoreName;
+                    saveFiles[temp + a].highScoreName = saveFiles[temp + b].highScoreName;
+                    saveFiles[temp + b].highScoreName = tempStr;
 
-        //            tempLI = saveFiles[temp + a].highScore1;
-        //            saveFiles[temp + a].highScore1 = saveFiles[temp + b].highScore1;
-        //            saveFiles[temp + b].highScore1 = tempLI;
-
-        //            strcpy(tempStr, saveFiles[temp + a].highScoreName);
-        //            strcpy(saveFiles[temp + a].highScoreName, saveFiles[temp + b].highScoreName);
-        //            strcpy(saveFiles[temp + b].highScoreName, tempStr);
-
-        //            tempByte = saveFiles[temp + a].highScoreDiff;
-        //            saveFiles[temp + a].highScoreDiff = saveFiles[temp + b].highScoreDiff;
-        //            saveFiles[temp + b].highScoreDiff = tempByte;
-        //        }
-        //    }
-        //}
+                    tempByte = saveFiles[temp + a].highScoreDiff;
+                    saveFiles[temp + a].highScoreDiff = saveFiles[temp + b].highScoreDiff;
+                    saveFiles[temp + b].highScoreDiff = tempByte;
+                }
+            }
+        }
     }
 
     public static IEnumerator e_JE_playCredits()

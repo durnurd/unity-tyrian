@@ -163,7 +163,7 @@ public static class ConfigC
         15, 50, 89, 240, 147, 34, 86, 9, 32, 208
     };
 
-    static readonly KeyCode[] defaultKeySettings =
+    public static readonly KeyCode[] defaultKeySettings =
     {
         KeyCode.UpArrow, KeyCode.DownArrow, KeyCode.LeftArrow, KeyCode.RightArrow, KeyCode.Space, KeyCode.Return, KeyCode.LeftControl, KeyCode.LeftAlt
     };
