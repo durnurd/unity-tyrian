@@ -9,6 +9,7 @@ using JE_real = System.Single;
 
 using static JoystickC;
 using static VideoC;
+using static MouseC;
 
 using UnityEngine;
 using System;
@@ -68,6 +69,8 @@ public static class KeyboardC
     private static bool[] accumulatedMouseUps = new bool[3];
     public static void input_grab(bool enable)
     {
+        if (!has_mouse)
+            return;
         input_grab_enabled = enable;
         Cursor.visible = !enable;
         Cursor.lockState = enable ? CursorLockMode.Locked : CursorLockMode.None;
@@ -141,7 +144,7 @@ public static class KeyboardC
 
         for (byte i = 0; i < 3; ++i)
         {
-            if (!input_grab_enabled && Input.GetMouseButton(i))
+            if (!input_grab_enabled && has_mouse && Input.GetMouseButton(i))
             {
                 input_grab(true);
                 break;

@@ -180,7 +180,7 @@ public static class VarzC
 
         public struct Shape
         {
-            public bool fill;
+            public int fill;
             public JE_byte[] sh;
         }
         public Shape[] shapes;

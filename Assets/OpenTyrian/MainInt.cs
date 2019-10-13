@@ -1995,6 +1995,33 @@ public static class MainIntC
                         }
                     }
 
+                    /* touch screen input */
+                    if ((inputDevice == 0 || inputDevice == 3) && touchscreen)
+                    {
+                        int count = Input.touchCount;
+                        if (count > 0 || Input.GetMouseButton(0))
+                        {
+                            Vector2 touch0Pos;
+                            if (count == 0)
+                                touch0Pos = Input.mousePosition;
+                            else
+                                touch0Pos = Input.GetTouch(0).position;
+                            touch0Pos.y = Screen.height - touch0Pos.y;
+                            //ED TODO: scale for screensize
+                            button[0] = true;
+                            for (int i = 1; i < count; i++)
+                            {
+                                Vector2 pos = Input.GetTouch(i).position;
+                                button[1] |= pos.x < touch0Pos.x;
+                                button[2] |= pos.x > touch0Pos.x;
+                            }
+                            int playerX = this_player.x - 5 - this_player.shot_hit_area_x * 3 / 2;
+                            int playerY = this_player.y + 7 + this_player.shot_hit_area_y * 3 / 2;
+                            mouseXC += (short)(touch0Pos.x - playerX);
+                            mouseYC += (short)(touch0Pos.y - playerY);
+                        }
+                    }
+
                     /* keyboard input */
                     if ((inputDevice == 0 || inputDevice == 1) && !play_demo)
                     {
@@ -2473,12 +2500,12 @@ public static class MainIntC
             }
             else
             {
-                if (shipGr_ == 0)
+                if (shipGr_ == 0) //Dragon Wing; double wide
                 {
                     blit_sprite2x2(VGAScreen, this_player.x - 17, this_player.y - 7, shapes9ptr_, ship_sprite + 13);
                     blit_sprite2x2(VGAScreen, this_player.x + 7, this_player.y - 7, shapes9ptr_, ship_sprite + 51);
                 }
-                else if (shipGr_ == 1)
+                else if (shipGr_ == 1)  //Nord; also double wide
                 {
                     blit_sprite2x2(VGAScreen, this_player.x - 17, this_player.y - 7, shapes9ptr_, 220);
                     blit_sprite2x2(VGAScreen, this_player.x + 7, this_player.y - 7, shapes9ptr_, 222);

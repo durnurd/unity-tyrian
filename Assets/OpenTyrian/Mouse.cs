@@ -21,7 +21,9 @@ public static class MouseC
     public const int RIGHT_MOUSE_BUTTON = 2;
     public const int MIDDLE_MOUSE_BUTTON = 3;
 
-    public static bool has_mouse => Input.mousePresent;
+    public static bool touchscreen = Input.touchSupported;
+
+    public static bool has_mouse => Input.mousePresent && !touchscreen;
     public static bool mouse_has_three_buttons = true;  //Probably
 
     public static JE_word lastMouseX, lastMouseY;

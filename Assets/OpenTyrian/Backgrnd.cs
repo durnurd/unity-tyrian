@@ -97,18 +97,29 @@ public static class BackgrndC
 
                 int dataIdx = y * 24;
 
-                for (int x = 24; x > 0; x--) {
-                    if (pixelsIdx >= pixels_ul)
-                        return;
+                if (((shape.fill & (1 << y)) != 0) && pixelsIdx >= pixels_ll && pixelsIdx + 24 <= pixels_ul)
+                {
+                    System.Array.Copy(data, dataIdx, pixels, pixelsIdx, 24);
+                    pixelsIdx += 24;
+                    dataIdx += 24;
+                }
+                else
+                {
 
-                    byte byt = data[dataIdx];
-                    if (pixelsIdx >= pixels_ll && byt != 0)
+                    for (int x = 24; x > 0; x--)
                     {
-                        pixels[pixelsIdx] = byt;
-                    }
+                        if (pixelsIdx >= pixels_ul)
+                            return;
 
-                    pixelsIdx++;
-                    dataIdx++;
+                        byte byt = data[dataIdx];
+                        if (pixelsIdx >= pixels_ll && byt != 0)
+                        {
+                            pixels[pixelsIdx] = byt;
+                        }
+
+                        pixelsIdx++;
+                        dataIdx++;
+                    }
                 }
             }
 

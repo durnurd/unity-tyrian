@@ -19,6 +19,7 @@ public class TestPalette : MonoBehaviour
     public bool ConstantPlay;
     public bool ConstantDie;
     public bool Xmas;
+    public bool TouchscreenOverride;
     
     void Start()
     {
@@ -26,6 +27,10 @@ public class TestPalette : MonoBehaviour
         constantPlay = ConstantPlay;
         constantDie = ConstantDie;
         xmasOverride = Xmas;
+        if (TouchscreenOverride)
+        {
+            MouseC.touchscreen = true;
+        }
 
         Songs = _songs;
         IntroPlayer = new GameObject("Intro Player").AddComponent<AudioSource>();

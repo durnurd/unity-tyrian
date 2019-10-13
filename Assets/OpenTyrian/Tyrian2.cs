@@ -3109,6 +3109,7 @@ public static class Tyrian2C
                 if (mapSh[0][x] == z + 1)
                 {
                     megaData1.shapes[x].sh = shape;
+                    megaData1.shapes[x].fill = int.MaxValue;
                 }
             }
 
@@ -3121,13 +3122,15 @@ public static class Tyrian2C
                     {
                         megaData2.shapes[x].sh = shape;
 
-                        bool fill = true;
-                        for (yy = 0; yy < (24 * 28) >> 1; yy++)
+                        int fill = int.MaxValue;
+                        for (int column = 0; column < 24; column++)
                         {
-                            if (shape[yy] == 0)
+                            for (int row = 0; row < 28; row++)
                             {
-                                fill = false;
-                                break;
+                                if (shape[row * 24 + column] == 0)
+                                {
+                                    fill &= ~(1 << row);
+                                }
                             }
                         }
 
@@ -3144,13 +3147,15 @@ public static class Tyrian2C
                     if (x < 70 && !shapeBlank)
                     {
                         megaData3.shapes[x].sh = shape;
-                        bool fill = true;
-                        for (yy = 0; yy < (24 * 28) >> 1; yy++)
+                        int fill = int.MaxValue;
+                        for (int column = 0; column < 24; column++)
                         {
-                            if (shape[yy] == 0)
+                            for (int row = 0; row < 28; row++)
                             {
-                                fill = false;
-                                break;
+                                if ((shape[row * 24 + column]) == 0)
+                                {
+                                    fill &= ~(1 << row);
+                                }
                             }
                         }
 
