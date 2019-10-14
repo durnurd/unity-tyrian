@@ -95,7 +95,8 @@ public static class LdsPlayC
 
     //public static bool playing, songlooped;
     public static bool playing => LoudnessC.IntroPlayer.isPlaying || LoudnessC.LoopPlayer.isPlaying;
-    public static bool songlooped;
+    public static double loopDspTime;
+    public static bool songlooped => UnityEngine.AudioSettings.dspTime > loopDspTime;
 
     public const float REFRESH = 70.0f;
 
@@ -238,7 +239,8 @@ public static class LdsPlayC
                                         jumping = 1;
                                         if (jumppos < posplay)
                                         {
-                                            songlooped = true;
+                                            //ED TODO: Music support
+                                            //songlooped = true;
                                         }
                                         break;
 

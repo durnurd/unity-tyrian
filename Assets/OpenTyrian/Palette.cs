@@ -85,7 +85,7 @@ class PaletteC
         SDL_SetColors(palette, first_color, last_color - first_color + 1);
     }
 
-    private static void init_step_fade_palette(int[][] diff, Color32[] colors, int first_color, int last_color)
+    public static void init_step_fade_palette(int[][] diff, Color32[] colors, int first_color, int last_color)
     {
         for (int i = first_color; i <= last_color; i++)
         {
@@ -95,7 +95,7 @@ class PaletteC
         }
     }
 
-    private static void init_step_fade_solid(int[][] diff, Color32 color, int first_color, int last_color)
+    public static void init_step_fade_solid(int[][] diff, Color32 color, int first_color, int last_color)
     {
         for (int i = first_color; i <= last_color; i++)
         {
@@ -105,7 +105,7 @@ class PaletteC
         }
     }
 
-    private static void step_fade_palette(int[][] diff, int steps, int first_color, int last_color)
+    public static void step_fade_palette(int[][] diff, int steps, int first_color, int last_color)
     {
         for (int i = first_color; i <= last_color; i++)
         {

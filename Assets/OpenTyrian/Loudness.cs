@@ -188,17 +188,20 @@ public static class LoudnessC
             IntroPlayer.Stop();
             LoopPlayer.Stop();
 
+            loopDspTime = double.MaxValue;
             if (Songs[song_num].Intro) {
                 IntroPlayer.clip = Songs[song_num].Intro;
                 if (Songs[song_num].Loop)
                 {
                     LoopPlayer.clip = Songs[song_num].Loop;
                     LoopPlayer.PlayScheduled(AudioSettings.dspTime + IntroPlayer.clip.length);
+                    loopDspTime = AudioSettings.dspTime + IntroPlayer.clip.length + LoopPlayer.clip.length;
                 }
                 IntroPlayer.Play();
             } else if (Songs[song_num].Loop) {
                 LoopPlayer.clip = Songs[song_num].Loop;
                 LoopPlayer.Play();
+                loopDspTime = AudioSettings.dspTime + LoopPlayer.clip.length;
             }
         }
 
@@ -216,6 +219,7 @@ public static class LoudnessC
     {
         IntroPlayer.Stop();
         LoopPlayer.Stop();
+        loopDspTime = double.MaxValue;
 
         music_stopped = true;
     }
