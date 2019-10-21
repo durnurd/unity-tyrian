@@ -121,6 +121,9 @@ public static class MainIntC
         gameLoaded = true;
         mainLevel = FIRST_LEVEL;
         saveLevel = FIRST_LEVEL;
+        
+        //ED TODO: Why is it necessary for me to add this?
+        jumpSection = true;
 
         play_song(26);
 
@@ -1179,7 +1182,7 @@ public static class MainIntC
         val = 0;
         return false;
     }
-
+    
     public static IEnumerator e_JE_operation(JE_byte slot)
     {
 
@@ -1976,7 +1979,7 @@ public static class MainIntC
                     service_SDL_events(false);
 
                     /* mouse input */
-                    if ((inputDevice == 0 || inputDevice == 2) && has_mouse)
+                    if ((inputDevice == 0 || inputDevice == 2) && has_mouse && !touchscreen)
                     {
                         button[0] |= mouse_pressed[0];
                         button[1] |= mouse_pressed[1];
@@ -2007,11 +2010,11 @@ public static class MainIntC
                             else
                                 touch0Pos = Input.GetTouch(0).position;
                             touch0Pos.y = Screen.height - touch0Pos.y;
-                            //ED TODO: scale for screensize
-                            button[0] = true;
+                            touch0Pos = scaleToVGA(touch0Pos);
+                            button[0] = Input.GetTouch(0).tapCount < 2;
                             for (int i = 1; i < count; i++)
                             {
-                                Vector2 pos = Input.GetTouch(i).position;
+                                Vector2 pos = scaleToVGA(Input.GetTouch(i).position);
                                 button[1] |= pos.x < touch0Pos.x;
                                 button[2] |= pos.x > touch0Pos.x;
                             }
@@ -2019,6 +2022,12 @@ public static class MainIntC
                             int playerY = this_player.y + 7 + this_player.shot_hit_area_y * 3 / 2;
                             mouseXC += (short)(touch0Pos.x - playerX);
                             mouseYC += (short)(touch0Pos.y - playerY);
+                        }
+                        else
+                        {
+                            button[0] = false;
+                            button[1] = false;
+                            button[2] = false;
                         }
                     }
 

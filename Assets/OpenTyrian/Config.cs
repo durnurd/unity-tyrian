@@ -14,6 +14,7 @@ using static PlayerC;
 using static EpisodesC;
 using static FileIO;
 using static LibC;
+using static ParamsC;
 
 using UnityEngine;
 using System.IO;
@@ -380,6 +381,11 @@ public static class ConfigC
 
         player[0].cash = saveFiles[slot - 1].score;
         player[1].cash = saveFiles[slot - 1].score2;
+        
+        if (richMode)
+        {
+            player[0].cash = 1000000;
+        }
 
         mainLevel = saveFiles[slot - 1].level;
         cubeMax = saveFiles[slot - 1].cubes;
