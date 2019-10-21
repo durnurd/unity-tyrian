@@ -1,24 +1,37 @@
 syntax: glob
 
+data/*
+
+opentyrian.cfg
+tyrian.cfg
+tyrian.sav
+
+# Text editor detritus
 *~
 *.swp
 
+# Make build output
 obj/*
 src/*.gch
-
 opentyrian
-opentyrian.exe
-opentyrian.gpe
 
+# Windows build output
+opentyrian.exe
 SDL.dll
 SDL_net.dll
 
-data/*
-
-opentyrian.conf
-tyrian.cfg
-tyrian.sav
+# Windows runtime output
 stderr.txt
 stdout.txt
 
+# MSVC build output and project
+opentyrian-*.exe
+opentyrian-*.ilk
+opentyrian-*.pdb
+opentyrian-*.iobj
+opentyrian-*.ipdb
+visualc/*.props
+visualc/*.user
+
+# Doxygen output
 doc/doxygen/

@@ -21,7 +21,7 @@ INSTALL ?= install
 PKG_CONFIG ?= pkg-config
 
 INSTALL_PROGRAM ?= $(INSTALL)
-INSTALL_DATA ?= ${INSTALL} -m 644
+INSTALL_DATA ?= $(INSTALL) -m 644
 
 prefix ?= /usr/local
 exec_prefix ?= $(prefix)
@@ -52,7 +52,8 @@ ifeq ($(WITH_NETWORK), true)
     EXTRA_CPPFLAGS += -DWITH_NETWORK
 endif
 
-HG_REV := $(shell hg id -ib && touch src/hg_revision.h)
+HG_REV := $(shell hg id -ib 2>/dev/null && \
+                  touch src/hg_revision.h)
 ifneq ($(HG_REV), )
     EXTRA_CPPFLAGS += -DHG_REV='"$(HG_REV)"'
 endif
@@ -60,7 +61,7 @@ endif
 CPPFLAGS := -DNDEBUG
 CFLAGS := -pedantic
 CFLAGS += -MMD
-CLFAGS += -Wall \
+CFLAGS += -Wall \
           -Wextra \
           -Wno-missing-field-initializers
 CFLAGS += -O2

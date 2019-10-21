@@ -30,9 +30,14 @@
 #include "video.h"
 #include "video_scale.h"
 
-#include <unistd.h>
 #include <sys/stat.h>
 
+#ifdef _MSC_VER
+#include <direct.h>
+#define mkdir _mkdir
+#else
+#include <unistd.h>
+#endif
 
 /* Configuration Load/Save handler */
 

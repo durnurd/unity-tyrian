@@ -659,12 +659,12 @@ void JE_loadScreen( void )
 				{
 					if (saveFiles[sel - 1].level > 0)
 					{
-						JE_playSampleNum (S_SELECT);
+						JE_playSampleNum(S_SELECT);
 						performSave = false;
 						JE_operation(sel);
 						quit = true;
 					} else {
-						JE_playSampleNum (S_CLINK);
+						JE_playSampleNum(S_CLINK);
 					}
 				} else {
 					quit = true;
@@ -1628,6 +1628,7 @@ void JE_highScoreCheck( void )
 							case '"':
 							case '\'':
 								validkey = true;
+								// fall through
 							default:
 								if (temp < 28 && (validkey || (lastkey_char >= 'A' && lastkey_char <= 'Z') || (lastkey_char >= '0' && lastkey_char <= '9')))
 								{
@@ -1979,8 +1980,8 @@ void JE_sort( void )
 
 void JE_playCredits( void )
 {
-	const int lines_max = 132;
-	const int line_max_length = 65;
+	enum { lines_max = 132 };
+	enum { line_max_length = 65 };
 	
 	char credstr[lines_max][line_max_length + 1];
 	
@@ -2244,7 +2245,7 @@ void JE_endLevelAni( void )
 			{
 				NETWORK_KEEP_ALIVE();
 
-				JE_playSampleNum(18);
+				JE_playSampleNum(S_ITEM);
 				x = 20 + 30 * temp;
 				y = 135;
 				JE_drawCube(VGAScreenSeg, x, y, 9, 0);
@@ -2459,6 +2460,7 @@ void JE_operation( JE_byte slot )
 					case '"':
 					case '\'':
 						validkey = true;
+						// fall through
 					default:
 						if (temp < 14 && (validkey || (lastkey_char >= 'A' && lastkey_char <= 'Z') || (lastkey_char >= '0' && lastkey_char <= '9')))
 						{

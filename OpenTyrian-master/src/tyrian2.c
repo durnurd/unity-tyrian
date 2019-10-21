@@ -1713,7 +1713,7 @@ level_loop:
 										else
 										{
 											JE_setupExplosion(enemy_screen_x, enemy[temp2].ey, 0, 1, false, false);
-											soundQueue[6] = S_SELECT; // S_EXPLOSION_8
+											soundQueue[6] = S_EXPLOSION_8;
 										}
 									}
 								}
@@ -3004,18 +3004,6 @@ new_game:
 						temp = atoi(s + 3);
 						play_song(temp - 1);
 						break;
-						
-#ifdef TYRIAN2000
-					case 'T':
-						/* TODO: Timed Battle ]T[ 43 44 45 46 47 */
-						printf("]T[ 43 44 45 46 47 handle timed battle!");
-						break;
-
-					case 'q':
-						/* TODO: Timed Battle end */
-						printf("handle timed battle end flag!");
-						break;
-#endif
 					}
 				}
 
@@ -3198,11 +3186,7 @@ bool JE_titleScreen( JE_boolean animate )
 {
 	bool quit = false;
 
-#ifdef TYRIAN2000
-	const int menunum = 6;
-#else
 	const int menunum = 7;
-#endif
 
 	unsigned int arcade_code_i[SA_ENGAGE] = { 0 };
 
@@ -3305,8 +3289,6 @@ bool JE_titleScreen( JE_boolean animate )
 	{
 		do
 		{
-			defaultBrightness = -3;
-
 			/* Animate instead of quickly fading in */
 			if (redraw)
 			{
@@ -3569,7 +3551,7 @@ bool JE_titleScreen( JE_boolean animate )
 							{
 								// allows player to smuggle arcade/super-arcade ships into full game
 								
-								ulong initial_cash[] = { 10000, 15000, 20000, 30000, 35000 };
+								ulong initial_cash[] = { 10000, 15000, 20000, 30000 };
 
 								assert(episodeNum >= 1 && episodeNum <= EPISODE_AVAILABLE);
 								player[0].cash = initial_cash[episodeNum-1];
@@ -3593,18 +3575,12 @@ bool JE_titleScreen( JE_boolean animate )
 						opentyrian_menu();
 						fadeIn = true;
 						break;
-#ifdef TYRIAN2000
-					case 5: /* Quit */
-						quit = true;
-						break;
-#else
 					case 5: /* Demo */
 						play_demo = true;
 						break;
 					case 6: /* Quit */
 						quit = true;
 						break;
-#endif
 					}
 					redraw = true;
 					break;
@@ -3651,8 +3627,7 @@ void intro_logos( void )
 
 void JE_readTextSync( void )
 {
-	return;  // this function seems to be unnecessary
-
+#if 0  // this function seems to be unnecessary
 	JE_clr256(VGAScreen);
 	JE_showVGA();
 	JE_loadPic(VGAScreen, 1, true);
@@ -3673,6 +3648,7 @@ void JE_readTextSync( void )
 		wait_delay();
 
 	} while (0 /* TODO: NETWORK */);
+#endif
 }
 
 
@@ -4275,12 +4251,17 @@ void JE_eventSystem( void )
 			eventRec[eventLoc-1].eventdat6 = 0;   /* We use EVENTDAT6 for the background */
 			JE_createNewEventEnemy(0, temp, 0);
 			JE_createNewEventEnemy(1, temp, 0);
-			enemy[b-1].ex += 24;
+			if (b > 0)
+				enemy[b-1].ex += 24;
 			JE_createNewEventEnemy(2, temp, 0);
-			enemy[b-1].ey -= 28;
+			if (b > 0)
+				enemy[b-1].ey -= 28;
 			JE_createNewEventEnemy(3, temp, 0);
-			enemy[b-1].ex += 24;
-			enemy[b-1].ey -= 28;
+			if (b > 0)
+			{
+				enemy[b-1].ex += 24;
+				enemy[b-1].ey -= 28;
+			}
 			break;
 		}
 	case 13:
