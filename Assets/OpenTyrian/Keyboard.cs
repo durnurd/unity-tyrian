@@ -19,6 +19,7 @@ using System.Collections;
 public static class KeyboardC
 {
     public static JE_boolean ESCPressed;
+    public static bool OverrideEscapePress;
 
     public static JE_boolean newkey, newmouse, keydown, mousedown;
     public static byte lastmouse_but;
@@ -69,8 +70,6 @@ public static class KeyboardC
     private static bool[] accumulatedMouseUps = new bool[3];
     public static void input_grab(bool enable)
     {
-        if (!has_mouse)
-            return;
         input_grab_enabled = enable;
         Cursor.visible = !enable;
         Cursor.lockState = enable ? CursorLockMode.Locked : CursorLockMode.None;
@@ -79,8 +78,18 @@ public static class KeyboardC
             CoroutineRunner.Instance.StopCoroutine(mouseMotionListener);
             mouseMotionListener = null;
         }
+
         if (enable)
-            mouseMotionListener = CoroutineRunner.Run(listenForMouseMotion());
+        {
+            if (touchscreen)
+            {
+                mouseMotionListener = CoroutineRunner.Run(listenForTouches());
+            }
+            else
+            {
+                mouseMotionListener = CoroutineRunner.Run(listenForMouseMotion());
+            }
+        }
     }
 
     private static IEnumerator listenForMouseMotion()
@@ -100,6 +109,31 @@ public static class KeyboardC
                 else if (Input.GetMouseButtonUp(i))
                 {
                     accumulatedMouseUps[i] = true;
+                }
+            }
+            yield return null;
+        }
+    }
+
+    private static IEnumerator listenForTouches()
+    {
+        accumulatedMouseX = 0;
+        accumulatedMouseY = 0;
+        while (true)
+        {
+            if (Input.touchCount > 0)
+            {
+                var touch = Input.GetTouch(0);
+                Vector2 deltaPos = touch.deltaPosition;
+                deltaPos = scaleToVGA(deltaPos);
+                accumulatedMouseX += deltaPos.x;
+                accumulatedMouseY -= deltaPos.y;
+                if (touch.tapCount > 1) {
+                    if (touch.phase == TouchPhase.Began) {
+                        accumulatedMouseDowns[0] = true;
+                    } else if (touch.phase == TouchPhase.Ended) {
+                        accumulatedMouseUps[0] = true;
+                    }
                 }
             }
             yield return null;
@@ -144,7 +178,7 @@ public static class KeyboardC
 
         for (byte i = 0; i < 3; ++i)
         {
-            if (!input_grab_enabled && has_mouse && Input.GetMouseButton(i))
+            if (!input_grab_enabled && ((has_mouse && Input.GetMouseButton(i)) || (touchscreen && Input.touchCount > 0)))
             {
                 input_grab(true);
                 break;
@@ -175,6 +209,11 @@ public static class KeyboardC
             KeyCode k = SupportedKeys[i];
             int idx = (int)k;
             bool active = Input.GetKey(k);
+            if (k == KeyCode.Escape && OverrideEscapePress)
+            {
+                active = true;
+                OverrideEscapePress = false;
+            }
             if (active && !keysactive[idx])
             {
                 if (k == KeyCode.F10)

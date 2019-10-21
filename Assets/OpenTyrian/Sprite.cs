@@ -226,7 +226,7 @@ const int SPRITES_PER_TABLE_MAX = 151;
     
     public static void JE_loadCompShapes(out byte[] sprite2s, char s)
     {
-        sprite2s = readAllBytes("newsh" + s + ".shp");
+        sprite2s = readAllBytes("newsh" + char.ToLower(s) + ".shp");
     }
 
     //// does not clip on left or right edges of surface

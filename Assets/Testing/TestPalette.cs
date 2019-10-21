@@ -58,4 +58,9 @@ public class TestPalette : MonoBehaviour
 
         StartCoroutine(e_main(0, new string[0]));
     }
+
+    public void Escape()
+    {
+        KeyboardC.OverrideEscapePress = true;
+    }
 }

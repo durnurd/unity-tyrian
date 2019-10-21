@@ -43,4 +43,11 @@ public static class VideoC
     {
         System.Array.Copy(blackScreen.pixels, pixels, pixels.Length);
     }
+
+    public static Vector2 scaleToVGA(Vector2 v)
+    {
+        v.x = v.x / Screen.width * 320;
+        v.y = v.y / Screen.height * 200;
+        return v;
+    }
 }

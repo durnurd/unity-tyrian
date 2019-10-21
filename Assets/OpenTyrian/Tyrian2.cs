@@ -166,7 +166,7 @@ public static class Tyrian2C
     {
         if (enemy[i].sprite2s == null)
         {
-            //fprintf(stderr, "warning: enemy %d sprite missing\n", i);
+            Debug.LogWarning("warning: enemy " + i + " sprite missing");
             return;
         }
 
@@ -2661,7 +2661,7 @@ public static class Tyrian2C
 
                                 do
                                 {
-                                    levelWarningText[levelWarningLines] = read_encrypted_pascal_string(ep_f);
+                                    levelWarningText[levelWarningLines] = s = read_encrypted_pascal_string(ep_f);
                                     levelWarningLines++;
                                 }
                                 while (s.Length == 0 || s[0] != '#');
@@ -3769,14 +3769,14 @@ public static class Tyrian2C
 	
 	    byte[] sprite2s = null;
 	    for (uint i = 0; i< 6; ++i)
-		    if (shapeTableI == enemyShapeTables[i])
-			    sprite2s = eShapes[i];
-	
-	    if (sprite2s != null)
-		    enemy.sprite2s = sprite2s;
-	    //else
-		   // // maintain buggy Tyrian behavior (use shape table value from previous enemy that occupied this index in the enemy array)
-		   // fprintf(stderr, "warning: ignoring sprite from unloaded shape table %d\n", shapeTableI);
+	        if (shapeTableI == enemyShapeTables[i])
+	            sprite2s = eShapes[i];
+
+        if (sprite2s != null)
+            enemy.sprite2s = sprite2s;
+        else
+		    // maintain buggy Tyrian behavior (use shape table value from previous enemy that occupied this index in the enemy array)
+	        Debug.LogWarning("warning: ignoring sprite from unloaded shape table " + shapeTableI);
 
         enemy.enemydatofs = enemyDat[eDatI];
 
@@ -4216,7 +4216,7 @@ public static class Tyrian2C
                                 JE_loadCompShapes(out eShapes[i], shapeFile[newEnemyShapeTables[i] - 1]);
                             }
                             else
-                                eShapes[i] = null;
+                                eShapes[i] = null;                                
 
                             enemyShapeTables[i] = newEnemyShapeTables[i];
                         }
@@ -4878,7 +4878,7 @@ public static class Tyrian2C
                 break;
 
             case 71:
-                if (checkCase71())
+                if (mapYPos <= eventRec[eventLoc - 1].eventdat2)
                 {
                     JE_eventJump(eventRec[eventLoc - 1].eventdat);
                 }
@@ -4991,13 +4991,6 @@ public static class Tyrian2C
         }
 
         eventLoc++;
-    }
-
-    private static bool checkCase71()
-    {
-        Debug.LogError("Figure this out");
-        //return ((mapYPos - &megaData1.mainmap) / sizeof(JE_byte*) * 2) <= (uint)eventRec[eventLoc - 1].eventdat2;
-        return false;
     }
 
     private static void applyCase77()

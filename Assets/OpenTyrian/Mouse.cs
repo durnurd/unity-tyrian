@@ -23,7 +23,7 @@ public static class MouseC
 
     public static bool touchscreen = Input.touchSupported;
 
-    public static bool has_mouse => Input.mousePresent && !touchscreen;
+    public static bool has_mouse => true;//Input.mousePresent && !touchscreen;
     public static bool mouse_has_three_buttons = true;  //Probably
 
     public static JE_word lastMouseX, lastMouseY;
