@@ -338,8 +338,6 @@ public static class GameMenuC
                 System.Array.Copy(VGAScreen2.pixels, VGAScreen.pixels, VGAScreen.pixels.Length);
             }
 
-            defaultBrightness = -3;
-
             if (curMenu == 1 && (curSel[curMenu] == 3 || curSel[curMenu] == 4))
             {
                 // reset temp_weapon_power[] every time we select upgrading front or back
@@ -2357,7 +2355,7 @@ public static class GameMenuC
         JE_loadPic(VGAScreen2, 1, false);
 
         //draw it
-        JE_playSampleNum(16);
+        JE_playSampleNum(S_SPRING);
         yield return Run(e_JE_scaleInPicture(VGAScreen, game_screen));
         yield return coroutine_wait_input(true, true, true);
     }

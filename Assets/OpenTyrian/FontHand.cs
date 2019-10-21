@@ -32,6 +32,7 @@ using static VGA256dC;
 using static NortVarsC;
 using static VideoC;
 using static NortsongC;
+using static SndMastC;
 using System.Collections;
 
 public static class FontHandC
@@ -63,7 +64,6 @@ public static class FontHandC
     public const int TRICK = 3;
     public const int NO_SHADE = 255;
 
-    public static JE_integer defaultBrightness = -3;
     public static JE_byte textGlowFont, textGlowBrightness = 6;
     public static JE_boolean levelWarningDisplay;
     public static JE_byte levelWarningLines;
@@ -76,6 +76,8 @@ public static class FontHandC
 
     public static void JE_dString(Surface screen, int x, int y, string s, ushort font)
     {
+        const JE_integer defaultBrightness = -3;
+
         int bright = 0;
 
         for (int i = 0; i < s.Length && s[i] != '\0'; ++i)
@@ -298,7 +300,7 @@ public static class FontHandC
             else
             {
                 warningSoundDelay = 14;
-                JE_playSampleNum(17);
+                JE_playSampleNum(S_WARNING);
             }
         }
     }

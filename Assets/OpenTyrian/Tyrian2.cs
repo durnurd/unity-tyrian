@@ -3318,8 +3318,6 @@ public static class Tyrian2C
         {
             do
             {
-                defaultBrightness = -3;
-
                 /* Animate instead of quickly fading in */
                 if (redraw)
                 {
@@ -4280,12 +4278,17 @@ public static class Tyrian2C
                     eventRec[eventLoc - 1].eventdat6 = 0;   /* We use EVENTDAT6 for the background */
                     JE_createNewEventEnemy(0, temp, 0);
                     JE_createNewEventEnemy(1, temp, 0);
-                    enemy[b - 1].ex += 24;
+                    if (b > 0)
+                        enemy[b - 1].ex += 24;
                     JE_createNewEventEnemy(2, temp, 0);
-                    enemy[b - 1].ey -= 28;
+                    if (b > 0)
+                        enemy[b - 1].ey -= 28;
                     JE_createNewEventEnemy(3, temp, 0);
-                    enemy[b - 1].ex += 24;
-                    enemy[b - 1].ey -= 28;
+                    if (b > 0)
+                    {
+                        enemy[b - 1].ex += 24;
+                        enemy[b - 1].ey -= 28;
+                    }
                     break;
                 }
             case 13:
