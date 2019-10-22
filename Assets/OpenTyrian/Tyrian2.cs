@@ -104,7 +104,7 @@ public static class Tyrian2C
                 srcIdx += game_screen.w * 183;
                 for (y = 0; y < 184; y++)
                 {
-                    System.Array.Copy(src, s, 264);
+                    System.Array.Copy(src, srcIdx, s, sIdx, 264);
                     sIdx += VGAScreenSeg.w;
                     srcIdx -= game_screen.w;
                 }

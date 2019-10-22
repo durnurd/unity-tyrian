@@ -10,11 +10,7 @@ using UnityEngine.Serialization;
 public class TestPalette : MonoBehaviour
 {
     public Material TargetMaterial;
-
-    [FormerlySerializedAs("Songs")]
-    [SerializeField]
-    private Song[] _songs;
-
+    
     public bool RichMode;
     public bool ConstantPlay;
     public bool ConstantDie;
@@ -32,10 +28,8 @@ public class TestPalette : MonoBehaviour
             MouseC.touchscreen = true;
         }
 
-        Songs = _songs;
-        IntroPlayer = new GameObject("Intro Player").AddComponent<AudioSource>();
-        LoopPlayer = new GameObject("Loop Player").AddComponent<AudioSource>();
-        LoopPlayer.loop = true;
+        MusicPlayer = new GameObject("Music Player").AddComponent<AudioSource>();
+        MusicPlayer.loop = true;
 
         AudioSource[] channels = new AudioSource[8];
         for (int i = 0; i < channels.Length; ++i)
@@ -57,6 +51,11 @@ public class TestPalette : MonoBehaviour
         TargetMaterial.SetTexture("_PalTex", pal);
 
         StartCoroutine(e_main(0, new string[0]));
+    }
+
+    private void OnDestroy()
+    {
+        deinit_audio();
     }
 
     public void Escape()

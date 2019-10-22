@@ -1,11 +1,15 @@
 ﻿using System.IO;
 using static System.Console;
+using static OplC;
+using static VarzC;
+using static LoudnessC;
 
 public static class LdsPlayC
 {
     private static readonly byte[] op_table = { 0x00, 0x01, 0x02, 0x08, 0x09, 0x0a, 0x10, 0x11, 0x12 };
 
-    class SoundBank {
+    class SoundBank
+    {
         public byte mod_misc, mod_vol, mod_ad, mod_sr, mod_wave,
             car_misc, car_vol, car_ad, car_sr, car_wave, feedback, keyoff,
             portamento, glide, finetune, vibrato, vibdelay, mod_trem, car_trem,
@@ -93,12 +97,49 @@ public static class LdsPlayC
     private static ushort numpatch, numposi, mainvolume;
 
 
-    //public static bool playing, songlooped;
-    public static bool playing => LoudnessC.IntroPlayer.isPlaying || LoudnessC.LoopPlayer.isPlaying;
-    public static double loopDspTime;
-    public static bool songlooped => UnityEngine.AudioSettings.dspTime > loopDspTime;
+    public static bool playing, songlooped;
+    //public static bool playing => LoudnessC.IntroPlayer.isPlaying || LoudnessC.LoopPlayer.isPlaying;
+    //public static double loopDspTime;
+    //public static bool songlooped => UnityEngine.AudioSettings.dspTime > loopDspTime;
 
     public const float REFRESH = 70.0f;
+
+    public static void lds_rewind()
+    {
+        int i;
+
+        /* init all with 0 */
+        tempo_now = 3;
+        playing = true; songlooped = false;
+        jumping = fadeonoff = allvolume = hardfade = pattplay = 0;
+        posplay = jumppos = mainvolume = 0;
+        for (i = 0; i < channel.Length; ++i)
+            channel[i] = new Channel();
+        FillByteArrayWithZeros(fmchip);
+
+        /* OPL2 init */
+        opl_init(44100);             /* Reset OPL chip */
+        opl_write(1, 0x20);
+        opl_write(8, 0);
+        opl_write(ARC_PERC_MODE, regbd);
+
+        for (i = 0; i < 9; i++)
+        {
+            opl_write(ARC_TVS_KSR_MUL + op_table[i], 0);
+            opl_write(ARC_TVS_KSR_MUL + 3 + op_table[i], 0);
+            opl_write(ARC_KSL_OUTLEV + op_table[i], 0x3f);
+            opl_write(ARC_KSL_OUTLEV + 3 + op_table[i], 0x3f);
+            opl_write(ARC_ATTR_DECR + op_table[i], 0xff);
+            opl_write(ARC_ATTR_DECR + 3 + op_table[i], 0xff);
+            opl_write(ARC_SUSL_RELR + op_table[i], 0xff);
+            opl_write(ARC_SUSL_RELR + 3 + op_table[i], 0xff);
+            opl_write(ARC_WAVE_SEL + op_table[i], 0);
+            opl_write(ARC_WAVE_SEL + 3 + op_table[i], 0);
+            opl_write(ARC_FREQ_NUM + i, 0);
+            opl_write(ARC_KON_BNUM + i, 0);
+            opl_write(ARC_FEEDBACK + i, 0);
+        }
+    }
 
     private static void lds_setregs(int reg, int val)
     {
@@ -106,7 +147,7 @@ public static class LdsPlayC
 
         fmchip[reg] = (byte)val;
 
-        //opl_write(reg, val);
+        opl_write(reg, (byte)val);
     }
 
     private static void lds_setregs_adv(int reg, int mask, int val)
@@ -139,8 +180,7 @@ public static class LdsPlayC
                     fadeonoff = 0;
                     if (hardfade != 0)
                     {
-                        //ED TODO: Music support
-                        //playing = false;
+                        playing = false;
                         hardfade = 0;
                         for (i = 0; i < 9; i++)
                         {
@@ -170,7 +210,7 @@ public static class LdsPlayC
             c = channel[chan];
             if (c.chancheat.chandelay > 0)
             {
-                if (!(--c.chancheat.chandelay > 0))
+                if (--c.chancheat.chandelay == 0)
                 {
                     lds_playsound(c.chancheat.sound, chan, c.chancheat.high);
                 }
@@ -219,8 +259,7 @@ public static class LdsPlayC
                                         break;
 
                                     case 0xfc:
-                                        //ED TODO: Music support
-                                        //playing = false;
+                                        playing = false;
                                         /* in real player there's also full keyoff here, but we don't need it */
                                         break;
 
@@ -239,8 +278,7 @@ public static class LdsPlayC
                                         jumping = 1;
                                         if (jumppos < posplay)
                                         {
-                                            //ED TODO: Music support
-                                            //songlooped = true;
+                                            songlooped = true;
                                         }
                                         break;
 
@@ -319,18 +357,18 @@ public static class LdsPlayC
 
                                 if ((transpose & 64) != 0)
                                 {
-                                    transp |= -1;   //ED TODO: Is this right? Was |= 128
+                                    transp = (sbyte)(transp | 128);
                                 }
 
                                 if ((transpose & 128) != 0)
                                 {
                                     sound = (byte)((comlo + transp) & maxsound);
-                                    high = (byte)(comhi << 4);
+                                    high = (ushort)(comhi << 4);
                                 }
                                 else
                                 {
                                     sound = (byte)(comlo & maxsound);
-                                    high = (byte)((comhi + transp) << 4);
+                                    high = (ushort)((comhi + transp) << 4);
                                 }
 
                                 /*
@@ -410,7 +448,7 @@ public static class LdsPlayC
             if (c.keycount > 0)
             {
                 if (c.keycount == 1)
-                    lds_setregs_adv(0xb0 + chan, 0xdf, 0);
+                    lds_setregs_adv(ARC_KON_BNUM + chan, 0xdf, 0);
                 c.keycount--;
             }
 
@@ -462,8 +500,8 @@ public static class LdsPlayC
 
                 freq = frequency[arpreg % (12 * 16)];
                 octave = (ushort)(arpreg / (12 * 16) - 1);
-                lds_setregs(0xa0 + chan, freq & 0xff);
-                lds_setregs_adv(0xb0 + chan, 0x20, ((octave << 2) + (freq >> 8)) & 0xdf);
+                lds_setregs(ARC_FREQ_NUM + chan, freq & 0xff);
+                lds_setregs_adv(ARC_KON_BNUM + chan, 0x20, ((octave << 2) + (freq >> 8)) & 0xdf);
             }
             else
             {
@@ -486,8 +524,8 @@ public static class LdsPlayC
 
                         freq = frequency[tune % (12 * 16)];
                         octave = (ushort)(tune / (12 * 16) - 1);
-                        lds_setregs(0xa0 + chan, freq & 0xff);
-                        lds_setregs_adv(0xb0 + chan, 0x20, ((octave << 2) + (freq >> 8)) & 0xdf);
+                        lds_setregs(ARC_FREQ_NUM + chan, freq & 0xff);
+                        lds_setregs_adv(ARC_KON_BNUM + chan, 0x20, ((octave << 2) + (freq >> 8)) & 0xdf);
                         c.vibcount += c.vibspeed;
                     }
                     else if (c.arp_size != 0)
@@ -499,8 +537,8 @@ public static class LdsPlayC
 
                         freq = frequency[tune % (12 * 16)];
                         octave = (ushort)(tune / (12 * 16) - 1);
-                        lds_setregs(0xa0 + chan, freq & 0xff);
-                        lds_setregs_adv(0xb0 + chan, 0x20, ((octave << 2) + (freq >> 8)) & 0xdf);
+                        lds_setregs(ARC_FREQ_NUM + chan, freq & 0xff);
+                        lds_setregs_adv(ARC_KON_BNUM + chan, 0x20, ((octave << 2) + (freq >> 8)) & 0xdf);
                     }
                 }
                 else
@@ -516,8 +554,8 @@ public static class LdsPlayC
 
                         freq = frequency[tune % (12 * 16)];
                         octave = (ushort)(tune / (12 * 16) - 1);
-                        lds_setregs(0xa0 + chan, freq & 0xff);
-                        lds_setregs_adv(0xb0 + chan, 0x20, ((octave << 2) + (freq >> 8)) & 0xdf);
+                        lds_setregs(ARC_FREQ_NUM + chan, freq & 0xff);
+                        lds_setregs_adv(ARC_KON_BNUM + chan, 0x20, ((octave << 2) + (freq >> 8)) & 0xdf);
                     }
                 }
             }
@@ -534,22 +572,22 @@ public static class LdsPlayC
                         level = 0;
 
                     if (allvolume != 0 && ((fmchip[0xc0 + chan] & 1) != 0))
-                        lds_setregs_adv(0x40 + regnum, 0xc0, ((level * allvolume) >> 8) ^ 0x3f);
+                        lds_setregs_adv(ARC_KSL_OUTLEV + regnum, 0xc0, ((level * allvolume) >> 8) ^ 0x3f);
                     else
-                        lds_setregs_adv(0x40 + regnum, 0xc0, level ^ 0x3f);
+                        lds_setregs_adv(ARC_KSL_OUTLEV + regnum, 0xc0, level ^ 0x3f);
 
                     c.trmcount += c.trmspeed;
                 }
                 else if (allvolume != 0 && ((fmchip[0xc0 + chan] & 1) != 0))
-                    lds_setregs_adv(0x40 + regnum, 0xc0, ((((c.volmod & 0x3f) * allvolume) >> 8) ^ 0x3f) & 0x3f);
+                    lds_setregs_adv(ARC_KSL_OUTLEV + regnum, 0xc0, ((((c.volmod & 0x3f) * allvolume) >> 8) ^ 0x3f) & 0x3f);
                 else
-                    lds_setregs_adv(0x40 + regnum, 0xc0, (c.volmod ^ 0x3f) & 0x3f);
+                    lds_setregs_adv(ARC_KSL_OUTLEV + regnum, 0xc0, (c.volmod ^ 0x3f) & 0x3f);
             }
             else
             {
                 c.trmwait--;
                 if (allvolume != 0 && ((fmchip[0xc0 + chan] & 1) != 0))
-                    lds_setregs_adv(0x40 + regnum, 0xc0, ((((c.volmod & 0x3f) * allvolume) >> 8) ^ 0x3f) & 0x3f);
+                    lds_setregs_adv(ARC_KSL_OUTLEV + regnum, 0xc0, ((((c.volmod & 0x3f) * allvolume) >> 8) ^ 0x3f) & 0x3f);
             }
 
             /* tremolo (carrier) */
@@ -564,21 +602,21 @@ public static class LdsPlayC
                         level = 0;
 
                     if (allvolume != 0)
-                        lds_setregs_adv(0x43 + regnum, 0xc0, ((level * allvolume) >> 8) ^ 0x3f);
+                        lds_setregs_adv(ARC_KSL_OUTLEV + 3 + regnum, 0xc0, ((level * allvolume) >> 8) ^ 0x3f);
                     else
-                        lds_setregs_adv(0x43 + regnum, 0xc0, level ^ 0x3f);
+                        lds_setregs_adv(ARC_KSL_OUTLEV + 3 + regnum, 0xc0, level ^ 0x3f);
                     c.trccount += c.trcspeed;
                 }
                 else if (allvolume != 0)
-                    lds_setregs_adv(0x43 + regnum, 0xc0, ((((c.volcar & 0x3f) * allvolume) >> 8) ^ 0x3f) & 0x3f);
+                    lds_setregs_adv(ARC_KSL_OUTLEV + 3 + regnum, 0xc0, ((((c.volcar & 0x3f) * allvolume) >> 8) ^ 0x3f) & 0x3f);
                 else
-                    lds_setregs_adv(0x43 + regnum, 0xc0, (c.volcar ^ 0x3f) & 0x3f);
+                    lds_setregs_adv(ARC_KSL_OUTLEV + 3 + regnum, 0xc0, (c.volcar ^ 0x3f) & 0x3f);
             }
             else
             {
                 c.trcwait--;
                 if (allvolume != 0)
-                    lds_setregs_adv(0x43 + regnum, 0xc0, ((((c.volcar & 0x3f) * allvolume) >> 8) ^ 0x3f) & 0x3f);
+                    lds_setregs_adv(ARC_KSL_OUTLEV + 3 + regnum, 0xc0, ((((c.volcar & 0x3f) * allvolume) >> 8) ^ 0x3f) & 0x3f);
             }
         }
 
@@ -672,10 +710,7 @@ public static class LdsPlayC
 
         int remaining = (int)(music_size - (f.BaseStream.Position - music_offset));
 
-        patterns = new ushort[remaining / 2];
-
-        for (int i = 0; i < remaining / 2; i++)
-            patterns[i] = f.ReadUInt16();
+        patterns = f.ReadUInt16s(remaining / 2);
 
         lds_rewind();
 
@@ -687,17 +722,6 @@ public static class LdsPlayC
         soundbank = null;
         positions = null;
         patterns = null;
-    }
-    public static void lds_rewind()
-    {
-        /* init all with 0 */
-        tempo_now = 3;
-        //ED TODO: Music support
-        //playing = true; songlooped = false;
-        jumping = fadeonoff = allvolume = hardfade = pattplay = 0;
-        posplay = jumppos = mainvolume = 0;
-        channel = new Channel[channel.Length];
-        fmchip = new byte[fmchip.Length];
     }
 
     private static void lds_playsound(int inst_number, int channel_number, int tunehigh)
@@ -732,7 +756,7 @@ public static class LdsPlayC
         }
 
         /* set modulator registers */
-        lds_setregs(0x20 + regnum, i.mod_misc);
+        lds_setregs(ARC_TVS_KSR_MUL + regnum, i.mod_misc);
         volcalc = i.mod_vol;
         if (c.nextvol == 0 || (i.feedback & 1) == 0)
             c.volmod = volcalc;
@@ -740,15 +764,15 @@ public static class LdsPlayC
             c.volmod = (byte)((volcalc & 0xc0) | ((((volcalc & 0x3f) * c.nextvol) >> 6)));
 
         if ((i.feedback & 1) == 1 && allvolume != 0)
-            lds_setregs(0x40 + regnum, ((c.volmod & 0xc0) | (((c.volmod & 0x3f) * allvolume) >> 8)) ^ 0x3f);
+            lds_setregs(ARC_KSL_OUTLEV + regnum, ((c.volmod & 0xc0) | (((c.volmod & 0x3f) * allvolume) >> 8)) ^ 0x3f);
         else
-            lds_setregs(0x40 + regnum, c.volmod ^ 0x3f);
-        lds_setregs(0x60 + regnum, i.mod_ad);
-        lds_setregs(0x80 + regnum, i.mod_sr);
-        lds_setregs(0xe0 + regnum, i.mod_wave);
+            lds_setregs(ARC_KSL_OUTLEV + regnum, c.volmod ^ 0x3f);
+        lds_setregs(ARC_ATTR_DECR + regnum, i.mod_ad);
+        lds_setregs(ARC_SUSL_RELR + regnum, i.mod_sr);
+        lds_setregs(ARC_WAVE_SEL + regnum, i.mod_wave);
 
         /* Set carrier registers */
-        lds_setregs(0x23 + regnum, i.car_misc);
+        lds_setregs(ARC_TVS_KSR_MUL + 3 + regnum, i.car_misc);
         volcalc = i.car_vol;
         if (c.nextvol == 0)
             c.volcar = volcalc;
@@ -756,14 +780,14 @@ public static class LdsPlayC
             c.volcar = (byte)((volcalc & 0xc0) | ((((volcalc & 0x3f) * c.nextvol) >> 6)));
 
         if (allvolume != 0)
-            lds_setregs(0x43 + regnum, ((c.volcar & 0xc0) | (((c.volcar & 0x3f) * allvolume) >> 8)) ^ 0x3f);
+            lds_setregs(ARC_KSL_OUTLEV + 3 + regnum, ((c.volcar & 0xc0) | (((c.volcar & 0x3f) * allvolume) >> 8)) ^ 0x3f);
         else
-            lds_setregs(0x43 + regnum, c.volcar ^ 0x3f);
-        lds_setregs(0x63 + regnum, i.car_ad);
-        lds_setregs(0x83 + regnum, i.car_sr);
-        lds_setregs(0xe3 + regnum, i.car_wave);
-        lds_setregs(0xc0 + channel_number, i.feedback);
-        lds_setregs_adv(0xb0 + channel_number, 0xdf, 0);        /* key off */
+            lds_setregs(ARC_KSL_OUTLEV + 3 + regnum, c.volcar ^ 0x3f);
+        lds_setregs(ARC_ATTR_DECR + 3 + regnum, i.car_ad);
+        lds_setregs(ARC_SUSL_RELR + 3 + regnum, i.car_sr);
+        lds_setregs(ARC_WAVE_SEL + 3 + regnum, i.car_wave);
+        lds_setregs(ARC_FEEDBACK + 3 + channel_number, i.feedback);
+        lds_setregs_adv(ARC_KON_BNUM + channel_number, 0xdf, 0);        /* key off */
 
         freq = frequency[tunehigh % (12 * 16)];
         octave = (byte)(tunehigh / (12 * 16) - 1);
@@ -771,21 +795,21 @@ public static class LdsPlayC
         {
             if (i.portamento == 0 || c.lasttune == 0)
             {
-                lds_setregs(0xa0 + channel_number, freq & 0xff);
-                lds_setregs(0xb0 + channel_number, (octave << 2) + 0x20 + (freq >> 8));
+                lds_setregs(ARC_FREQ_NUM + channel_number, freq & 0xff);
+                lds_setregs(ARC_KON_BNUM + channel_number, (octave << 2) + 0x20 + (freq >> 8));
                 c.lasttune = c.gototune = (ushort)tunehigh;
             }
             else
             {
                 c.gototune = (ushort)tunehigh;
                 c.portspeed = i.portamento;
-                lds_setregs_adv(0xb0 + channel_number, 0xdf, 0x20); /* key on */
+                lds_setregs_adv(ARC_KON_BNUM + channel_number, 0xdf, 0x20); /* key on */
             }
         }
         else
         {
-            lds_setregs(0xa0 + channel_number, freq & 0xff);
-            lds_setregs(0xb0 + channel_number, (octave << 2) + 0x20 + (freq >> 8));
+            lds_setregs(ARC_FREQ_NUM + channel_number, freq & 0xff);
+            lds_setregs(ARC_KON_BNUM + channel_number, (octave << 2) + 0x20 + (freq >> 8));
             c.lasttune = (ushort)tunehigh;
             c.gototune = (ushort)(tunehigh + ((i.glide + 0x80) & 0xff) - 0x80); /* set destination */
             c.portspeed = i.portamento;

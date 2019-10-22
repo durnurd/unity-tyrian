@@ -10,6 +10,7 @@ using JE_real = System.Single;
 using static NortsongC;
 using static FileIO;
 using static LdsPlayC;
+using static OplC;
 
 using System.IO;
 using UnityEngine;
@@ -44,91 +45,89 @@ public static class LoudnessC
 
     private const int freq = 44100;
 
-    public static Song[] Songs;
-    public static AudioSource IntroPlayer;
-    public static AudioSource LoopPlayer;
+    public static AudioSource MusicPlayer;
     public static AudioSource[] SampleChannels;
+    private static AudioClip musicClip;
 
     public static bool init_audio()
     {
         if (audio_disabled)
             return false;
 
+        musicClip = AudioClip.Create("music", 1024, 1, freq, true, audio_cb_unity);
+        MusicPlayer.clip = musicClip;
+
         return true;
     }
 
-
     private static int ct;
-    private static void audio_cb(float[] feedme)
+    private static void audio_cb_unity(float[] feedme)
     {
-        int howmuch = feedme.Length;
+        if (!music_disabled && !music_stopped)
+        {
+            int howmuch = feedme.Length;
+            /* SYN: Simulate the fm synth chip */
+            int feedmeIdx = 0;
+            int remaining = howmuch;
+            while (remaining > 0)
+            {
+                while (ct < 0)
+                {
+                    ct += freq;
+                    lds_update(); /* SYN: Do I need to use the return value for anything here? */
+                }
+                /* SYN: Okay, about the calculations below. I still don't 100% get what's going on, but...
+                - freq is samples/time as output by SDL.
+                - REFRESH is how often the play proc would have been called in Tyrian. Standard speed is
+                70Hz, which is the default value of 70.0f
+                - ct represents the margin between play time (representing # of samples) and tick speed of
+                the songs (70Hz by default). It keeps track of which one is ahead, because they don't
+                synch perfectly. */
 
-        //if (!music_disabled && !music_stopped)
+                /* set i to smaller of data requested by SDL and a value calculated from the refresh rate */
+                int i = (int)((ct / REFRESH) + 4) & ~3;
+                i = (i > remaining) ? remaining : i; /* i should now equal the number of samples we get */
+                opl_update(feedme, feedmeIdx, i);
+                feedmeIdx += i;
+                remaining -= i;
+                ct -= (int)(REFRESH * i);
+            }
+
+            /* Reduce the music volume. */
+            //int qu = howmuch / BYTES_PER_SAMPLE;
+            //for (int smp = 0; smp < qu; smp++)
+            //{
+            //    feedme[smp] = (short)(feedme[smp] * music_volume);
+            //}
+        }
+
+        //If we were blending all audio into a single clip:
+        //if (!samples_disabled)
         //{
-
-        //    /* SYN: Simulate the fm synth chip */
-        //    int feedmeIdx = 0;
-        //    int remaining = howmuch / BYTES_PER_SAMPLE;
-        //    while (remaining > 0)
+        //    /* SYN: Mix sound channels and shove into audio buffer */
+        //    for (int ch = 0; ch < SFX_CHANNELS; ch++)
         //    {
-        //        while (ct < 0)
+        //        float volume = sample_volume * (channel_vol[ch] / (float)SFX_CHANNELS);
+
+        //        /* SYN: Don't copy more data than is in the channel! */
+        //        uint qu = ((uint)howmuch > channel_len[ch] ? channel_len[ch] : (uint)howmuch) / BYTES_PER_SAMPLE;
+        //        for (uint smp = 0; smp < qu; smp++)
         //        {
-        //            ct += freq;
-        //            lds_update(); /* SYN: Do I need to use the return value for anything here? */
+        //            int clip = (int)(feedme[smp] * 32768) + (int)(channel_pos[ch][smp + channel_pos_offset[ch]] * volume);
+        //            feedme[smp] = ((clip > 0x7fff) ? 0x7fff : (clip <= -0x8000) ? -0x8000 : (short)clip) / 32768.0f;
         //        }
-        //        /* SYN: Okay, about the calculations below. I still don't 100% get what's going on, but...
-        //        - freq is samples/time as output by SDL.
-        //        - REFRESH is how often the play proc would have been called in Tyrian. Standard speed is
-        //        70Hz, which is the default value of 70.0f
-        //        - ct represents the margin between play time (representing # of samples) and tick speed of
-        //        the songs (70Hz by default). It keeps track of which one is ahead, because they don't
-        //        synch perfectly. */
 
-        //        /* set i to smaller of data requested by SDL and a value calculated from the refresh rate */
-        //        int i = (int)((ct / REFRESH) + 4) & ~3;
-        //        i = (i > remaining) ? remaining : i; /* i should now equal the number of samples we get */
-                
-        //        //opl_update(feedme, feedmeIdx, i);
+        //        channel_pos_offset[ch] += qu;
+        //        channel_len[ch] -= qu * BYTES_PER_SAMPLE;
 
-        //        feedmeIdx += i;
-        //        remaining -= i;
-        //        ct -= (int)(REFRESH * i);
-        //    }
-
-        //    /* Reduce the music volume. */
-        //    int qu = howmuch / BYTES_PER_SAMPLE;
-        //    for (int smp = 0; smp < qu; smp++)
-        //    {
-        //        feedme[smp] *= music_volume;
+        //        /* SYN: If we've emptied a channel buffer, let's free the memory and clear the channel. */
+        //        if (channel_len[ch] == 0)
+        //        {
+        //            channel_buffer[ch] = channel_pos[ch] = null;
+        //            channel_pos_offset[ch] = 0;
+        //        }
         //    }
         //}
-
-        if (!samples_disabled)
-        {
-            /* SYN: Mix sound channels and shove into audio buffer */
-            for (int ch = 0; ch < SFX_CHANNELS; ch++)
-            {
-                float volume = sample_volume * (channel_vol[ch] / (float)SFX_CHANNELS);
-
-                /* SYN: Don't copy more data than is in the channel! */
-                uint qu = ((uint)howmuch > channel_len[ch] ? channel_len[ch] : (uint)howmuch) / BYTES_PER_SAMPLE;
-                for (uint smp = 0; smp < qu; smp++)
-                {
-                    int clip = (int)(feedme[smp] * 32768) + (int)(channel_pos[ch][smp + channel_pos_offset[ch]] * volume);
-                    feedme[smp] = ((clip > 0x7fff) ? 0x7fff : (clip <= -0x8000) ? -0x8000 : (short)clip) / 32768.0f;
-                }
-
-                channel_pos_offset[ch] += qu;
-                channel_len[ch] -= qu * BYTES_PER_SAMPLE;
-
-                /* SYN: If we've emptied a channel buffer, let's free the memory and clear the channel. */
-                if (channel_len[ch] == 0)
-                {
-                    channel_buffer[ch] = channel_pos[ch] = null;
-                    channel_pos_offset[ch] = 0;
-                }
-            }
-        }
 
         //TODO do conversion
         //SDL_ConvertAudio(&audio_cvt);
@@ -147,6 +146,7 @@ public static class LoudnessC
         }
 
         lds_free();
+        music_file.Close();
     }
 
 
@@ -185,24 +185,7 @@ public static class LoudnessC
         {
             load_song(song_num);
             song_playing = song_num;
-            IntroPlayer.Stop();
-            LoopPlayer.Stop();
-
-            loopDspTime = double.MaxValue;
-            if (Songs[song_num].Intro) {
-                IntroPlayer.clip = Songs[song_num].Intro;
-                if (Songs[song_num].Loop)
-                {
-                    LoopPlayer.clip = Songs[song_num].Loop;
-                    LoopPlayer.PlayScheduled(AudioSettings.dspTime + IntroPlayer.clip.length);
-                    loopDspTime = AudioSettings.dspTime + IntroPlayer.clip.length + LoopPlayer.clip.length;
-                }
-                IntroPlayer.Play();
-            } else if (Songs[song_num].Loop) {
-                LoopPlayer.clip = Songs[song_num].Loop;
-                LoopPlayer.Play();
-                loopDspTime = AudioSettings.dspTime + LoopPlayer.clip.length;
-            }
+            ResetAudioSource();
         }
 
         music_stopped = false;
@@ -217,11 +200,14 @@ public static class LoudnessC
 
     public static void stop_song()
     {
-        IntroPlayer.Stop();
-        LoopPlayer.Stop();
-        loopDspTime = double.MaxValue;
-
         music_stopped = true;
+        ResetAudioSource();
+    }
+
+    private static void ResetAudioSource()
+    {
+        MusicPlayer.Stop();
+        MusicPlayer.Play();
     }
 
     public static void fade_song()
@@ -231,7 +217,7 @@ public static class LoudnessC
 
     public static void set_volume(int music, int sample)
     {
-        LoopPlayer.volume = IntroPlayer.volume = music * (1.5f / 255.0f);
+        MusicPlayer.volume = music * (1.5f / 255.0f);
         music_volume = music * (1.5f / 255.0f);
         sample_volume = sample * (1.0f / 255.0f);
     }
@@ -255,20 +241,5 @@ public static class LoudnessC
         channel.clip = createdSounds[buffer];
         channel.volume = sample_volume * ((vol + 1) / 8.0f);
         channel.Play();
-
-        return;
-        channel_len[chan] = (uint)(size * BYTES_PER_SAMPLE * 4);
-        channel_buffer[chan] = new ushort[channel_len[chan] / 2];
-        channel_pos[chan] = channel_buffer[chan];
-        channel_pos_offset[chan] = 0;
-        channel_vol[chan] = (byte)(vol + 1);
-
-        for (int i = 0; i < size; i++)
-        {
-            for (int ex = 0; ex < 4; ex++)
-            {
-                channel_buffer[chan][(i * 4) + ex] = (ushort)(buffer[i] << 8);
-            }
-        }
     }
 }

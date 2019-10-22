@@ -2011,7 +2011,7 @@ public static class MainIntC
                                 touch0Pos = Input.GetTouch(0).position;
                             touch0Pos.y = Screen.height - touch0Pos.y;
                             touch0Pos = scaleToVGA(touch0Pos);
-                            button[0] = Input.GetTouch(0).tapCount < 2;
+                            button[0] = count == 0 || Input.GetTouch(0).tapCount < 2;
                             for (int i = 1; i < count; i++)
                             {
                                 Vector2 pos = scaleToVGA(Input.GetTouch(i).position);
