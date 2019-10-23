@@ -93,5 +93,15 @@ public static class SndMastC
     "VOICE8",
     "VOICE9"
     };
-    public static JE_byte[] windowTextSamples = EmptyArray<JE_byte>(9);
+    public static JE_byte[] windowTextSamples = {
+        V_DANGER,
+        V_BOSS,
+        V_ENEMIES,
+        V_CLEARED_PLATFORM,
+        V_DANGER,
+        V_SPIKES,
+        V_ACCELERATE,
+        V_DANGER,
+        V_ENEMIES
+    };
 }

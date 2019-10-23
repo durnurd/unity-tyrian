@@ -377,7 +377,7 @@ public static class LdsPlayC
                                 high = (comhi + (((transpose + 0x24) & 0xff) - 0x24)) << 4;
                                 */
 
-                                if (chandelay[chan] != 0)
+                                if (chandelay[chan] == 0)
                                 {
                                     lds_playsound(sound, chan, high);
                                 }
@@ -786,7 +786,7 @@ public static class LdsPlayC
         lds_setregs(ARC_ATTR_DECR + 3 + regnum, i.car_ad);
         lds_setregs(ARC_SUSL_RELR + 3 + regnum, i.car_sr);
         lds_setregs(ARC_WAVE_SEL + 3 + regnum, i.car_wave);
-        lds_setregs(ARC_FEEDBACK + 3 + channel_number, i.feedback);
+        lds_setregs(ARC_FEEDBACK + channel_number, i.feedback);
         lds_setregs_adv(ARC_KON_BNUM + channel_number, 0xdf, 0);        /* key off */
 
         freq = frequency[tunehigh % (12 * 16)];
