@@ -27,6 +27,6 @@ public static class PcxMastC
         "FIREPICA.PCX"
     };
     public static readonly JE_byte[] pcxpal = { 0, 7, 5, 8, 10, 5, 18, 19, 19, 20, 21, 22, 5 };    /* [1..PCXnum] */
-    public static readonly JE_byte[] facepal = { 1, 2, 3, 4, 6, 9, 11, 12, 16, 13, 14, 15 };       /* [1..12] */
+    public static readonly JE_byte[] facepal = { 1, 2, 3, 4, 6, 9, 11, 12, 16, 13, 14, 15, 1, 5, 1, 1, 21 };       /* [1..16] */
     public static readonly JE_longint[] pcxpos = new JE_longint[PCX_NUM + 1];   /* [1..PCXnum + 1] */
 }

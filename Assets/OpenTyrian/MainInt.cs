@@ -327,7 +327,7 @@ public static class MainIntC
 
     public static IEnumerator e_JE_helpSystem(JE_byte startTopic)
     { UnityEngine.Debug.Log("e_JE_helpSystem");
-        JE_integer page, lastPage = 0;
+        int page, lastPage = 0;
         JE_byte menu;
 
         page = topicStart[startTopic - 1];
@@ -359,11 +359,13 @@ public static class MainIntC
 
             if (page > 0)
             {
-                string buf = miscText[24] + " " + (page - topicStart[temp2] + 1);
-                JE_outText(VGAScreen, 10, 192, buf, 13, 5);
+                int idx = page - topicStart[temp2] + 1;
+                JE_outText(VGAScreen, 10, 192, idx.ToStringNoAlloc(miscText[24], " "), 0, -1, 13, 5);
 
-                buf = miscText[25] + " " + page + " of " + MAX_PAGE;
-                JE_outText(VGAScreen, 220, 192, buf, 13, 5);
+                int pos = 0;
+                char[] buffer = page.ToStringNoAlloc(miscText[25], " ", " of ", ref pos);
+                buffer = MAX_PAGE.ToStringNoAlloc(null, null, null, ref pos);
+                JE_outText(VGAScreen, 220, 192, buffer, 0, -1, 13, 5);
 
                 JE_dString(VGAScreen, JE_fontCenter(topicName[temp2], SMALL_FONT_SHAPES), 1, topicName[temp2], SMALL_FONT_SHAPES);
             }
@@ -626,7 +628,6 @@ public static class MainIntC
         JE_byte sel, screen, min = 0, max = 0;
         string tempstr;
         string tempstr2;
-        int len;
 
         tempstr = null;
 
@@ -952,7 +953,8 @@ public static class MainIntC
                         if (levelWarningDisplay)
                             JE_updateWarning(VGAScreen);
 
-                        yield return new WaitForSeconds(.016f);
+                        yield return null;
+                        //yield return new WaitForSeconds(.016f);
                     }
                     while (!(delaycount() == 0 || ESCPressed));
 
@@ -1337,12 +1339,10 @@ public static class MainIntC
     public static void JE_inGameDisplays()
     {
         string stemp;
-        string tempstr;
 
         for (int i = 0; i < ((twoPlayerMode && !galagaMode) ? 2 : 1); ++i)
         {
-            tempstr = player[i].cash.ToString();
-            JE_textShade(VGAScreen, 30 + 200 * i, 175, tempstr, 2, 4, FULL_SHADE);
+            JE_textShade(VGAScreen, 30 + 200 * i, 175, player[i].cash.ToStringNoAlloc(), 0, -1, 2, 4, FULL_SHADE);
         }
 
         /*Special Weapon?*/
@@ -1363,8 +1363,7 @@ public static class MainIntC
                 {
                     blit_sprite2(VGAScreen, tempW, y, shapes9, 285);
                     tempW = (ushort)((temp == 0) ? 45 : 250);
-                    tempstr = extra_lives.ToString();
-                    JE_textShade(VGAScreen, tempW, y + 3, tempstr, 15, 1, FULL_SHADE);
+                    JE_textShade(VGAScreen, tempW, y + 3, extra_lives.ToStringNoAlloc(), 0, -1, 15, 1, FULL_SHADE);
                 }
                 else if (extra_lives >= 1)
                 {
@@ -1516,7 +1515,7 @@ public static class MainIntC
 
         /* {!Activate Nort Ship!} */
         if (keysactive[(int)KeyCode.F2] && keysactive[(int)KeyCode.F4] && keysactive[(int)KeyCode.F6] && keysactive[(int)KeyCode.F7] &&
-            keysactive[(int)KeyCode.F9] && keysactive[(int)KeyCode.Backslash] && keysactive[(int)KeyCode.Slash])
+            keysactive[(int)KeyCode.F9] && (keysactive[(int)KeyCode.Backslash] || keysactive[(int)KeyCode.Slash]))
         {
             if (isNetworkGame)
             {

@@ -42,6 +42,7 @@ public class TestPalette : MonoBehaviour
         tex.filterMode = FilterMode.Point;
         tex.wrapMode = TextureWrapMode.Clamp;
         ScreenTexture = tex;
+        JE_showVGA();
         TargetMaterial.mainTexture = tex;
 
         Texture2D pal = new Texture2D(256, 1, TextureFormat.RGB24, false);

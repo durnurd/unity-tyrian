@@ -2,7 +2,7 @@
 using static FontC;
 using static FontC.Font;
 using static FontC.FontAlignment;
-//using static destructC;
+using static DestructC;
 using static EditShipC;
 using static EpisodesC;
 using static FileIO;
@@ -348,8 +348,7 @@ public const string opentyrian_str = "OpenTyrian",
 
             if (loadDestruct)
             {
-                throw new System.NotImplementedException();
-                //JE_destructGame();
+                yield return Run(e_JE_destructGame());
                 loadDestruct = false;
             }
             else

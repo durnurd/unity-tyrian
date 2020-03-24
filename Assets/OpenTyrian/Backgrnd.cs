@@ -60,6 +60,10 @@ public static class BackgrndC
           pixels_ll = 0,  // lower limit
           pixels_ul = (surface.h * surface.w);  // upper limit
 
+        if (rowIdx < 0 || rowIdx >= map.mainmap.Length)
+        {
+            return;
+        }
         byte[] row = map.mainmap[rowIdx];
         byte[] prevRow = map.mainmap[rowIdx - 1];
         int maxTile = leftCol + 12;

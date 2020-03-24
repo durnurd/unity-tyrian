@@ -64,9 +64,13 @@ public static class NortsongC {
         return Time.time * 1000 < target;
     }
 
+    private static float targetFPS = 1 / Application.targetFrameRate;
     public static WaitForSeconds coroutine_wait_delay()
     {
-        return new WaitForSeconds(target / 1000.0f - Time.time);
+        float delay = target / 1000.0f - Time.time;
+        //if (delay < 1f / targetFPS)
+        //    return null;
+        return new WaitForSeconds(delay);
     }
 
     public static uint SDL_GetTicks()

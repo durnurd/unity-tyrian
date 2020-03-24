@@ -786,6 +786,7 @@ public static class Tyrian2C
         mapXPos = 0;
         mapXOfs = 0;
         mapX2Pos = 0;
+        mapX2Ofs = 0;
         mapX3Pos = 0;
         mapX3Ofs = 0;
         mapXbpPos = 0;
@@ -3014,12 +3015,12 @@ public static class Tyrian2C
 #if TYRIAN2000
                                             case 'T':
                                                 /* TODO: Timed Battle ]T[ 43 44 45 46 47 */
-                                                printf("]T[ 43 44 45 46 47 handle timed battle!");
+                                                Debug.Log("]T[ 43 44 45 46 47 handle timed battle!");
                                                 break;
 
                                             case 'q':
                                                 /* TODO: Timed Battle end */
-                                                printf("handle timed battle end flag!");
+                                                Debug.Log("handle timed battle end flag!");
                                                 break;
 #endif
                     }

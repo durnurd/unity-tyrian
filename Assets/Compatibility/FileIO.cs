@@ -3,9 +3,15 @@ using UnityEngine;
 
 public static class FileIO
 {
+#if TYRIAN2000
+    private const string folder = "tyrian2000";
+#else
+    private const string folder = "tyrian21";
+#endif
+
     public static byte[] readAllBytes(string filename)
     {
-        string path = Path.Combine(Application.streamingAssetsPath, "tyrian21", filename);
+        string path = Path.Combine(Application.streamingAssetsPath, folder, filename);
         if (File.Exists(path))
             return File.ReadAllBytes(path);
         return null;
@@ -26,7 +32,7 @@ public static class FileIO
 
     public static BinaryReader open(string filename)
     {
-        string path = Path.Combine(Application.streamingAssetsPath, "tyrian21", filename);
+        string path = Path.Combine(Application.streamingAssetsPath, folder, filename);
         if (File.Exists(path))
             return new BinaryReader(File.OpenRead(path));
         return null;
@@ -34,7 +40,7 @@ public static class FileIO
 
     public static bool fileExists(string filename)
     {
-        string path = Path.Combine(Application.streamingAssetsPath, "tyrian21", filename);
+        string path = Path.Combine(Application.streamingAssetsPath, folder, filename);
         return File.Exists(path);
     }
 

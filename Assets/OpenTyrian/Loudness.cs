@@ -222,18 +222,20 @@ public static class LoudnessC
         sample_volume = sample * (1.0f / 255.0f);
     }
 
-    private static Dictionary<byte[], AudioClip> createdSounds;
+    private static Dictionary<byte[], AudioClip> createdSounds = new Dictionary<JE_byte[], AudioClip>();
     public static void JE_multiSamplePlay(byte[] buffer, JE_word size, JE_byte chan, JE_byte vol)
     {
         if (audio_disabled || samples_disabled)
             return;
 
-        if (createdSounds == null)
-            createdSounds = new Dictionary<JE_byte[], AudioClip>();
         if (!createdSounds.ContainsKey(buffer))
         {
             AudioClip clip = AudioClip.Create("snd" + createdSounds.Count, size, 1, 11025, false);
-            float[] samples = buffer.Select(e => ((sbyte)e) / 128.0f).ToArray();
+            float[] samples = new float[buffer.Length];
+            for (int i = 0; i < buffer.Length; ++i)
+            {
+                samples[i] = ((sbyte)buffer[i]) / 128.0f;
+            }
             clip.SetData(samples, 0);
             createdSounds[buffer] = clip;
         }

@@ -43,7 +43,7 @@ public static class EpisodesC
     public const int FIRST_LEVEL = 1;
     public const int EPISODE_MAX = 5;
 #if TYRIAN2000
-public static const int EPISODE_AVAILABLE = 5;
+    public const int EPISODE_AVAILABLE = 5;
 #else
     public const int EPISODE_AVAILABLE = 4;
 #endif
@@ -229,9 +229,9 @@ public static const int EPISODE_AVAILABLE = 5;
         }
 
 #if TYRIAN2000
-        if (episodeNum <= 3) fseek(f, 0x252A4, SEEK_SET);
-        if (episodeNum == 4) fseek(f, 0xC1F5E, SEEK_SET);
-        if (episodeNum == 5) fseek(f, 0x5C5B8, SEEK_SET);
+        if (episodeNum <= 3) f.BaseStream.Seek(0x252A4, SeekOrigin.Begin);
+        if (episodeNum == 4) f.BaseStream.Seek(0xC1F5E, SeekOrigin.Begin);
+        if (episodeNum == 5) f.BaseStream.Seek(0x5C5B8, SeekOrigin.Begin);
 #endif
 
         for (int i = 0; i < PORT_NUM + 1; ++i)
@@ -250,10 +250,13 @@ public static const int EPISODE_AVAILABLE = 5;
 
         int specials_count = SPECIAL_NUM;
 #if TYRIAN2000
-        if (episodeNum <= 3) fseek(f, 0x2662E, SEEK_SET);
-        if (episodeNum == 4) fseek(f, 0xC32E8, SEEK_SET);
-        if (episodeNum == 5) fseek(f, 0x5D942, SEEK_SET);
-        if (episodeNum >= 4) specials_count = SPECIAL_NUM + 8; /*this ugly hack will need a fix*/
+        if (episodeNum <= 3) f.BaseStream.Seek(0x2662E, SeekOrigin.Begin);
+        if (episodeNum == 4) f.BaseStream.Seek(0xC32E8, SeekOrigin.Begin);
+        if (episodeNum == 5) f.BaseStream.Seek(0x5D942, SeekOrigin.Begin);
+        if (episodeNum >= 4) {
+            specials_count = SPECIAL_NUM + 8;
+            special = EmptyArray<JE_SpecialType>(SPECIAL_NUM + 8 + 1);
+        }; /*this ugly hack will need a fix*/
 #endif
 
         for (int i = 0; i < specials_count + 1; ++i)
@@ -267,9 +270,9 @@ public static const int EPISODE_AVAILABLE = 5;
         }
 
 #if TYRIAN2000
-        if (episodeNum <= 3) fseek(f, 0x26E21, SEEK_SET);
-        if (episodeNum == 4) fseek(f, 0xC3ADB, SEEK_SET);
-        if (episodeNum == 5) fseek(f, 0x5E135, SEEK_SET);
+        if (episodeNum <= 3) f.BaseStream.Seek(0x26E21, SeekOrigin.Begin);
+        if (episodeNum == 4) f.BaseStream.Seek(0xC3ADB, SeekOrigin.Begin);
+        if (episodeNum == 5) f.BaseStream.Seek(0x5E135, SeekOrigin.Begin);
 #endif
 
         for (int i = 0; i < POWER_NUM + 1; ++i)
@@ -283,9 +286,9 @@ public static const int EPISODE_AVAILABLE = 5;
         }
 
 #if TYRIAN2000
-        if (episodeNum <= 3) fseek(f, 0x26F24, SEEK_SET);
-        if (episodeNum == 4) fseek(f, 0xC3BDE, SEEK_SET);
-        if (episodeNum == 5) fseek(f, 0x5E238, SEEK_SET);
+        if (episodeNum <= 3) f.BaseStream.Seek(0x26F24, SeekOrigin.Begin);
+        if (episodeNum == 4) f.BaseStream.Seek(0xC3BDE, SeekOrigin.Begin);
+        if (episodeNum == 5) f.BaseStream.Seek(0x5E238, SeekOrigin.Begin);
 #endif
 
         for (int i = 0; i < SHIP_NUM + 1; ++i)
@@ -302,9 +305,9 @@ public static const int EPISODE_AVAILABLE = 5;
         }
 
 #if TYRIAN2000
-        if (episodeNum <= 3) fseek(f, 0x2722F, SEEK_SET);
-        if (episodeNum == 4) fseek(f, 0xC3EE9, SEEK_SET);
-        if (episodeNum == 5) fseek(f, 0x5E543, SEEK_SET);
+        if (episodeNum <= 3) f.BaseStream.Seek(0x2722F, SeekOrigin.Begin);
+        if (episodeNum == 4) f.BaseStream.Seek(0xC3EE9, SeekOrigin.Begin);
+        if (episodeNum == 5) f.BaseStream.Seek(0x5E543, SeekOrigin.Begin);
 #endif
 
         for (int i = 0; i < OPTION_NUM + 1; ++i)
@@ -327,9 +330,9 @@ public static const int EPISODE_AVAILABLE = 5;
         }
 
 #if TYRIAN2000
-        if (episodeNum <= 3) fseek(f, 0x27EF3, SEEK_SET);
-        if (episodeNum == 4) fseek(f, 0xC4BAD, SEEK_SET);
-        if (episodeNum == 5) fseek(f, 0x5F207, SEEK_SET);
+        if (episodeNum <= 3) f.BaseStream.Seek(0x27EF3, SeekOrigin.Begin);
+        if (episodeNum == 4) f.BaseStream.Seek(0xC4BAD, SeekOrigin.Begin);
+        if (episodeNum == 5) f.BaseStream.Seek(0x5F207, SeekOrigin.Begin);
 #endif
 
         for (int i = 0; i < SHIELD_NUM + 1; ++i)

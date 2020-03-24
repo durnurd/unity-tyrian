@@ -127,39 +127,126 @@ public static class FontHandC
 
         return x;
     }
+
+    public static char[] ToStringNoAlloc(this int value, string prefix = null, string prefix2 = null, string suffix = null)
+    {
+        int pos = 0;
+        return ToStringNoAlloc(value, prefix, prefix2, suffix, ref pos);
+    }
+
+    public static char[] ToStringNoAlloc(this int value, string prefix, string prefix2, string suffix, ref int pos)
+    {
+        int start = pos;
+        if (prefix != null)
+        {
+            prefix.CopyTo(0, sharedBuffer, 0, prefix.Length);
+            start += prefix.Length;
+        }
+
+        if (prefix2 != null)
+        {
+            prefix2.CopyTo(0, sharedBuffer, start, prefix2.Length);
+            start += prefix2.Length;
+        }
+
+        bool negative = value < 0;
+        if (negative)
+        {
+            sharedBuffer[start++] = '-';
+            value = -value;
+        }
+
+        int index = start;
+
+        if (value == 0)
+        {
+            sharedBuffer[index++] = '0';
+        }
+        while (value > 0)
+        {
+            int digit = value % 10;
+            sharedBuffer[index++] = (char)(digit + '0');
+            value /= 10;
+        }
+        System.Array.Reverse(sharedBuffer, start, index - start);
+
+        if (suffix != null)
+        {
+            suffix.CopyTo(0, sharedBuffer, index, suffix.Length);
+            index += suffix.Length;
+        }
+
+        sharedBuffer[index] = '\0';
+
+        pos = index;
+
+        return sharedBuffer;
+    }
+
+    private static char[] sharedBuffer = new char[32];
     public static void JE_textShade(Surface screen, int x, int y, string s, int colorbankI, int brightnessI, ushort shadetype)
     {
+        if (s.Length > sharedBuffer.Length)
+        {
+            sharedBuffer = s.ToCharArray();
+        } else
+        {
+            s.CopyTo(0, sharedBuffer, 0, s.Length);
+        }
+        JE_textShade(screen, x, y, sharedBuffer, 0, s.Length, colorbankI, brightnessI, shadetype);
+    }
+
+    public static void JE_textShade(Surface screen, int x, int y, char[] s, int start, int len, int colorbankI, int brightnessI, ushort shadetype)
+    {
+        if (len < 0)
+            len = s.Length;
         byte colorbank = (byte)colorbankI;
         sbyte brightness = (sbyte)brightnessI;
         switch (shadetype)
         {
             case PART_SHADE:
-                JE_outText(screen, x + 1, y + 1, s, 0, -1);
-                JE_outText(screen, x, y, s, colorbank, brightness);
+                JE_outText(screen, x + 1, y + 1, s, start, len, 0, -1);
+                JE_outText(screen, x, y, s, start, len, colorbank, brightness);
                 break;
             case FULL_SHADE:
-                JE_outText(screen, x - 1, y, s, 0, -1);
-                JE_outText(screen, x + 1, y, s, 0, -1);
-                JE_outText(screen, x, y - 1, s, 0, -1);
-                JE_outText(screen, x, y + 1, s, 0, -1);
-                JE_outText(screen, x, y, s, colorbank, brightness);
+                JE_outText(screen, x - 1, y, s, start, len, 0, -1);
+                JE_outText(screen, x + 1, y, s, start, len, 0, -1);
+                JE_outText(screen, x, y - 1, s, start, len, 0, -1);
+                JE_outText(screen, x, y + 1, s, start, len, 0, -1);
+                JE_outText(screen, x, y, s, start, len, colorbank, brightness);
                 break;
             case DARKEN:
-                JE_outTextAndDarken(screen, x + 1, y + 1, s, colorbank, brightness, TINY_FONT);
+                JE_outTextAndDarken(screen, x + 1, y + 1, s, start, len, colorbank, brightness, TINY_FONT);
                 break;
             case TRICK:
-                JE_outTextModify(screen, x, y, s, colorbank, brightness, TINY_FONT);
+                JE_outTextModify(screen, x, y, s, start, len, colorbank, brightness, TINY_FONT);
                 break;
         }
     }
     public static void JE_outText(Surface screen, int x, int y, string s, int colorbankI, int brightnessI)
     {
+        if (s.Length > sharedBuffer.Length)
+        {
+            sharedBuffer = s.ToCharArray();
+        }
+        else
+        {
+            s.CopyTo(0, sharedBuffer, 0, s.Length);
+        }
+        JE_outText(screen, x, y, sharedBuffer, 0, s.Length, colorbankI, brightnessI);
+    }
+
+    public static void JE_outText(Surface screen, int x, int y, char[] s, int start, int len, int colorbankI, int brightnessI)
+    {
+        if (len < 0)
+            len = s.Length;
+
         byte colorbank = (byte)colorbankI;
         sbyte brightness = (sbyte)brightnessI;
 
         int bright = 0;
 
-        for (int i = 0; i < s.Length && s[i] != '\0'; ++i)
+        for (int i = start; i < start + len && s[i] != '\0'; ++i)
         {
             int sprite_id = font_ascii[s[i]];
 
@@ -189,10 +276,26 @@ public static class FontHandC
     }
     public static void JE_outTextModify(Surface screen, int x, int y, string s, int filterI, int brightnessI, ushort font)
     {
+        if (s.Length > sharedBuffer.Length)
+        {
+            sharedBuffer = s.ToCharArray();
+        }
+        else
+        {
+            s.CopyTo(0, sharedBuffer, 0, s.Length);
+        }
+        JE_outTextModify(screen, x, y, sharedBuffer, 0, s.Length, filterI, brightnessI, font);
+    }
+
+    public static void JE_outTextModify(Surface screen, int x, int y, char[] s, int start, int len, int filterI, int brightnessI, ushort font)
+    {
+        if (len < 0)
+            len = s.Length;
+
         byte filter = (byte)filterI;
         sbyte brightness = (sbyte)brightnessI;
 
-        for (int i = 0; i < s.Length && s[i] != '\0'; ++i)
+        for (int i = start; i < start + len && s[i] != '\0'; ++i)
         {
             int sprite_id = font_ascii[s[i]];
 
@@ -246,11 +349,30 @@ public static class FontHandC
         if (s == null)
             return;
 
+        if (s.Length > sharedBuffer.Length)
+        {
+            sharedBuffer = s.ToCharArray();
+        }
+        else
+        {
+            s.CopyTo(0, sharedBuffer, 0, s.Length);
+        }
+        JE_outTextAndDarken(screen, x, y, sharedBuffer, 0, s.Length, colorbankI, brightnessI, font);
+    }
+
+    public static void JE_outTextAndDarken(Surface screen, int x, int y, char[] s, int start, int len, int colorbankI, int brightnessI, ushort font)
+    {
+        if (s == null)
+            return;
+
+        if (len < 0)
+            len = s.Length;
+
         byte colorbank = (byte)colorbankI;
         sbyte brightness = (sbyte)brightnessI;
         int bright = 0;
 
-        for (int i = 0; i < s.Length && s[i] != '\0'; ++i)
+        for (int i = start; i < start + len && s[i] != '\0'; ++i)
         {
             int sprite_id = font_ascii[s[i]];
 

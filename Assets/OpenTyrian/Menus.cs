@@ -219,7 +219,7 @@ public static class MenusC
                     difficulty_max++;
                 }
             }
-            else if (difficulty_max == 5 && keysactive[(int)KeyCode.L] && keysactive[(int)KeyCode.R] && keysactive[(int)KeyCode.D])
+            else if (difficulty_max == 5 && keysactive[(int)KeyCode.L] && keysactive[(int)KeyCode.O] && keysactive[(int)KeyCode.R] && keysactive[(int)KeyCode.D])
             {
                 difficulty_max++;
             }

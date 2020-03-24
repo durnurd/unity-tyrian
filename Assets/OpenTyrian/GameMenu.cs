@@ -667,8 +667,8 @@ public static class GameMenuC
                     /* Draw Cost: if it's not the DONE option */
                     if (tempW != menuChoices[curMenu] - 1)
                     {
-                        string buf = "Cost: " + temp_cost;
-                        JE_textShade(VGAScreen, 187, tempY + 10, buf, temp2 / 16, temp2 % 16 - 8 - afford_shade, DARKEN);
+                        char[] buf = ((int)temp_cost).ToStringNoAlloc("Cost: ");
+                        JE_textShade(VGAScreen, 187, tempY + 10, buf, 0, -1, temp2 / 16, temp2 % 16 - 8 - afford_shade, DARKEN);
                     }
                 }
             } /* /weapon upgrade */
@@ -679,8 +679,7 @@ public static class GameMenuC
             {
                 if (curMenu != 4)
                 {
-                    string buf = player[0].cash.ToString();
-                    JE_textShade(VGAScreen, 65, 173, buf, 1, 6, DARKEN);
+                    JE_textShade(VGAScreen, 65, 173, player[0].cash.ToStringNoAlloc(), 0, -1, 1, 6, DARKEN);
                 }
                 JE_barDrawShadow(VGAScreen, 42, 152, 3, 14, player[0].armor, 2, 13);
                 JE_barDrawShadow(VGAScreen, 104, 152, 2, 14, (JE_word)(shields[player[0].items.shield].mpwr * 2), 2, 13);
@@ -693,8 +692,7 @@ public static class GameMenuC
                 {
                     for (int i = 0; i < 2; ++i)
                     {
-                        string buf = miscText[40 + i] + " " + player[i].cash;
-                        JE_textShade(VGAScreen, 25, 50 + 10 * i, buf, 15, 0, FULL_SHADE);
+                        JE_textShade(VGAScreen, 25, 50 + 10 * i, player[i].cash.ToStringNoAlloc(miscText[40 + i], " "), 0, -1, 15, 0, FULL_SHADE);
                     }
                 }
                 else if (superArcadeMode != SA_NONE || superTyrian)
@@ -795,10 +793,8 @@ public static class GameMenuC
                         // modify pallete for face
                         paletteChanged = true;
                         temp2 = facepal[face_sprite];
-                        newPal = 0;
 
-                        for (temp = 1; temp <= 255 - (3 * 16); temp++)
-                            colors[temp] = palettes[temp2][temp];
+                        System.Array.Copy(palettes[temp2], 1, colors, 1, 255 - (3 * 16));
                     }
                 }
             }
@@ -913,8 +909,8 @@ public static class GameMenuC
                                            ? 100
                                            : (yLoc * 100) / ((cube[currentCube].last_line - 9) * 12);
 
-                        string buf = miscText[11] + " " + percent_read + "%";
-                        JE_outTextAndDarken(VGAScreen, 176, 160, buf, 14, 1, TINY_FONT);
+                        char[] buf = percent_read.ToStringNoAlloc(miscText[11], " ", "%");
+                        JE_outTextAndDarken(VGAScreen, 176, 160, buf, 0, -1, 14, 1, TINY_FONT);
 
                         JE_dString(VGAScreen, 260, 160, miscText[12], SMALL_FONT_SHAPES);
 
@@ -1676,6 +1672,38 @@ public static class GameMenuC
             yield return Run(e_fade_black(10));
     }
 
+    static readonly int[] front_weapon_xy_list =
+{
+             -1,  4,  9,  3,  8,  2,  5, 10,  1, -1,
+             -1, -1, -1,  7,  8, -1, -1,  0, -1,  4,
+              0, -1, -1,  3, -1,  4, -1,  4, -1, -1,
+             -1,  9,  0,  0,  0,  0,  0,  0,  0,  0,
+              0,  3,  9
+            };
+
+    private static readonly int[] front_weapon_x = { 59, 66, 66, 54, 61, 51, 58, 51, 61, 52, 53, 58 };
+    private static readonly int[] front_weapon_y = { 38, 53, 41, 36, 48, 35, 41, 35, 53, 41, 39, 31 };
+    private static readonly int[] weapon_sprites =
+    {
+        -1,  0,  1,  2,  3,  4,  5,  6,  7,  8,
+         9, 10, 11, 21,  5, 13, -1, 14, 15,  0,
+        14,  9,  8,  2, 15,  0, 13,  0,  8,  8,
+        11,  1,  0,  0,  0,  0,  0,  0,  0,  0,
+         0,  2,  1
+        };
+
+    private static readonly int[] rear_weapon_xy_list =
+    {
+            -1, -1, -1, -1, -1, -1, -1, -1, -1,  0,
+             1,  2,  3, -1,  4,  5, -1, -1,  6, -1,
+            -1,  1,  0, -1,  6, -1,  5, -1,  0,  0,
+             3,  0,  0,  0,  0,  0,  0,  0,  0,  0,
+             0, -1, -1
+            };
+
+    private static readonly int[] rear_weapon_x = { 41, 27, 49, 43, 51, 39, 41 };
+    private static readonly int[] rear_weapon_y = { 92, 92, 113, 102, 97, 96, 76 };
+
     private static void draw_ship_illustration()
     {
         // full of evil hardcoding
@@ -1710,29 +1738,9 @@ public static class GameMenuC
             blit_sprite(VGAScreenSeg, x, y, WEAPON_SHAPES, sprite_id);
         }
 
-        int[] weapon_sprites =
-        {
-        -1,  0,  1,  2,  3,  4,  5,  6,  7,  8,
-         9, 10, 11, 21,  5, 13, -1, 14, 15,  0,
-        14,  9,  8,  2, 15,  0, 13,  0,  8,  8,
-        11,  1,  0,  0,  0,  0,  0,  0,  0,  0,
-         0,  2,  1
-        };
-
         // front weapon
         if (player[0].items.weapon[FRONT_WEAPON].id > 0)
         {
-            int[] front_weapon_xy_list =
-            {
-             -1,  4,  9,  3,  8,  2,  5, 10,  1, -1,
-             -1, -1, -1,  7,  8, -1, -1,  0, -1,  4,
-              0, -1, -1,  3, -1,  4, -1,  4, -1, -1,
-             -1,  9,  0,  0,  0,  0,  0,  0,  0,  0,
-              0,  3,  9
-            };
-
-            int[] front_weapon_x = { 59, 66, 66, 54, 61, 51, 58, 51, 61, 52, 53, 58 };
-            int[] front_weapon_y = { 38, 53, 41, 36, 48, 35, 41, 35, 53, 41, 39, 31 };
             int x = front_weapon_x[front_weapon_xy_list[player[0].items.weapon[FRONT_WEAPON].id]],
                 y = front_weapon_y[front_weapon_xy_list[player[0].items.weapon[FRONT_WEAPON].id]];
 
@@ -1742,17 +1750,6 @@ public static class GameMenuC
         // rear weapon
         if (player[0].items.weapon[REAR_WEAPON].id > 0)
         {
-            int[] rear_weapon_xy_list =
-            {
-            -1, -1, -1, -1, -1, -1, -1, -1, -1,  0,
-             1,  2,  3, -1,  4,  5, -1, -1,  6, -1,
-            -1,  1,  0, -1,  6, -1,  5, -1,  0,  0,
-             3,  0,  0,  0,  0,  0,  0,  0,  0,  0,
-             0, -1, -1
-            };
-
-            int[] rear_weapon_x = { 41, 27, 49, 43, 51, 39, 41 };
-            int[] rear_weapon_y = { 92, 92, 113, 102, 97, 96, 76 };
             int x = rear_weapon_x[rear_weapon_xy_list[player[0].items.weapon[REAR_WEAPON].id]],
                 y = rear_weapon_y[rear_weapon_xy_list[player[0].items.weapon[REAR_WEAPON].id]];
 
@@ -2559,7 +2556,8 @@ public static class GameMenuC
             JE_scaleBitmap(dst, src, 160 - i, 0, 160 + i - 1, 100 + (int)Round(i * 0.625f) - 1);
             JE_showVGA();
 
-            yield return new WaitForSeconds(.001f);
+            yield return null;
+            //yield return new WaitForSeconds(.001f);
         }
     }
 
@@ -2567,8 +2565,7 @@ public static class GameMenuC
     {
         if (curMenu == 4)
         {
-            string cl = JE_cashLeft().ToString();
-            JE_textShade(VGAScreen, 65, 173, cl, 1, 6, DARKEN);
+            JE_textShade(VGAScreen, 65, 173, JE_cashLeft().ToStringNoAlloc(), 0, -1, 1, 6, DARKEN);
         }
     }
 
@@ -3150,8 +3147,7 @@ public static class GameMenuC
         {
             if (leftPower)
             {
-                buf = downgradeCost.ToString();
-                JE_outText(VGAScreen, 26, 137, buf, 1, 4);
+                JE_outText(VGAScreen, 26, 137, ((int)downgradeCost).ToStringNoAlloc(), 0, -1, 1, 4);
             }
             else
             {
@@ -3162,14 +3158,12 @@ public static class GameMenuC
             {
                 if (!rightPowerAfford)
                 {
-                    buf = upgradeCost.ToString();
-                    JE_outText(VGAScreen, 108, 137, buf, 7, 4);
+                    JE_outText(VGAScreen, 108, 137, ((int)upgradeCost).ToStringNoAlloc(), 0, -1, 7, 4);
                     blit_sprite(VGAScreenSeg, 119, 149, OPTION_SHAPES, 14);  // upgrade disabled
                 }
                 else
                 {
-                    buf = upgradeCost.ToString();
-                    JE_outText(VGAScreen, 108, 137, buf, 1, 4);
+                    JE_outText(VGAScreen, 108, 137, ((int)upgradeCost).ToStringNoAlloc(), 0, -1, 1, 4);
                 }
             }
             else
@@ -3187,8 +3181,7 @@ public static class GameMenuC
                 fill_rectangle_xy(VGAScreen, 39 + x * 6, 165, 39 + x * 6 + 4, 165, 249);
             }
 
-            buf = "POWER: " + temp;
-            JE_outText(VGAScreen, 58, 137, buf, 15, 4);
+            JE_outText(VGAScreen, 58, 137, temp.ToStringNoAlloc("POWER: "), 0, -1, 15, 4);
         }
         else
         {

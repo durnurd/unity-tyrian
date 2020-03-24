@@ -31,6 +31,7 @@ public static class KeyboardC
 
     private static readonly KeyCode[] SupportedKeys = Enum.GetValues(typeof(KeyCode)).Cast<KeyCode>().Where(e => e < KeyCode.Mouse0).ToArray();     //Mouse0 is the first entry we don't support
     public static bool[] keysactive = new bool[(int)SupportedKeys.Max() + 1];
+    public static bool[] keyswereactive = new bool[(int)SupportedKeys.Max() + 1];
 
     public static KeyCode lastkey_sym;
     public static char lastkey_char;
@@ -214,7 +215,7 @@ public static class KeyboardC
                 active = true;
                 OverrideEscapePress = false;
             }
-            if (active && !keysactive[idx])
+            if (active && !keyswereactive[idx])
             {
                 if (k == KeyCode.F10)
                 {
@@ -224,7 +225,15 @@ public static class KeyboardC
                 lastkey_sym = k;
                 lastkey_char = (char)lastkey_sym;
             }
-            keydown |= keysactive[idx] = active;
+            if (active && keyswereactive[idx] && !keysactive[idx])
+            {
+                //We intentionally turned it off. Don't turn it back on until we get another key down
+            }
+            else
+            {
+                keydown |= keysactive[idx] = keyswereactive[idx] = active;
+            }
+
         }
         ESCPressed = keysactive[(int)KeyCode.Escape];
     }

@@ -944,9 +944,7 @@ public static class VarzC
         }
     }
 
-    public static void JE_setupExplosion(int x, int y, int delta_y, int type, bool fixed_position, bool follow_player)
-    {
-        (int sprite, int ttl)[] explosion_data = /* [1..53] */ new[]{
+        static (int sprite, int ttl)[] explosion_data = /* [1..53] */ new[]{
                     ( 144,  7 ),
                     ( 120, 12 ),
                     ( 190, 12 ),
@@ -1001,6 +999,8 @@ public static class VarzC
                     ( 227, 14 ),
                     ( 265, 14 )
         };
+    public static void JE_setupExplosion(int x, int y, int delta_y, int type, bool fixed_position, bool follow_player)
+    {
 
         if (y > -16 && y < 190)
         {
