@@ -42,9 +42,13 @@ class PaletteC
 
     public static void JE_loadPals()
     {
+        UnityEngine.Debug.Log("JE_loadPals");
         BinaryReader f = open("palette.dat");
+        UnityEngine.Debug.Log("f = " + f);
 
         int palette_count = (int)f.BaseStream.Length / (256 * 3);
+
+        UnityEngine.Debug.Log("palette_count = " + palette_count);
 
         for (int p = 0; p < palette_count; ++p)
         {
@@ -109,15 +113,17 @@ class PaletteC
     {
         for (int i = first_color; i <= last_color; i++)
         {
-            int[] delta = { (int)(diff[i][0] / steps), (int)(diff[i][1] / steps), (int)(diff[i][2] / steps) };
+            int deltaR = (int)(diff[i][0] / steps);
+            int deltaG = (int)(diff[i][1] / steps);
+            int deltaB = (int)(diff[i][2] / steps);
 
-            diff[i][0] -= delta[0];
-            diff[i][1] -= delta[1];
-            diff[i][2] -= delta[2];
+            diff[i][0] -= deltaR;
+            diff[i][1] -= deltaG;
+            diff[i][2] -= deltaB;
 
-            palette[i].r = (byte)(palette[i].r + delta[0]);
-            palette[i].g = (byte)(palette[i].g + delta[1]);
-            palette[i].b = (byte)(palette[i].b + delta[2]);
+            palette[i].r = (byte)(palette[i].r + deltaR);
+            palette[i].g = (byte)(palette[i].g + deltaG);
+            palette[i].b = (byte)(palette[i].b + deltaB);
         }
 
 

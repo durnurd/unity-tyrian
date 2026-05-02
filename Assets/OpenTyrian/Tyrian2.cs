@@ -651,7 +651,9 @@ public static class Tyrian2C
 	   the loadmap function. */
 
     start_level:
+#if !UNITY_WEBGL
         Application.targetFrameRate = 60;
+#endif
 
         if (galagaMode)
             twoPlayerMode = false;
@@ -3213,7 +3215,9 @@ public static class Tyrian2C
     { UnityEngine.Debug.Log("e_JE_titleScreen");
         refQuit[0] = false;
 
+#if !UNITY_WEBGL
         Application.targetFrameRate = 60;
+#endif
 
 #if TYRIAN2000
         const int menunum = 6;
@@ -3644,6 +3648,8 @@ public static class Tyrian2C
 
     public static IEnumerator e_intro_logos()
     { UnityEngine.Debug.Log("e_intro_logos");
+        moveTyrianLogoUp = true;
+
         JE_clr256(VGAScreen);
 
         yield return Run(e_fade_black(50));

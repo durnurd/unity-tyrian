@@ -486,7 +486,9 @@ public static class ConfigC
     public static void JE_setNewGameSpeed()
     {
         pentiumMode = false;
+#if !UNITY_WEBGL
         Application.targetFrameRate = 30;
+#endif
 
         switch (fastPlay)
         {
@@ -496,13 +498,17 @@ public static class ConfigC
                 frameCountMax = 2;
                 break;
             case 1: //Turbo
+#if !UNITY_WEBGL
                 Application.targetFrameRate = 100;
+#endif
                 speed = 0x3000;
                 smoothScroll = true;
                 frameCountMax = 2;
                 break;
             case 2: //HYPER SPEED
+#if !UNITY_WEBGL
                 Application.targetFrameRate = 999;
+#endif
                 speed = 0x2000;
                 smoothScroll = false;
                 frameCountMax = 2;
@@ -782,7 +788,7 @@ public static class ConfigC
             int high = fi.ReadByte();
 
             /* SYN: This is truncating to bytes. I have no idea what this is doing or why. */
-            /* TODO: Figure out what this is about and make sure it isn't broked. */
+            /* TODO: Figure out what this is about and make sure it isn't broken. */
             editorLevel = (JE_word)((high << 8) | low);
 
             fi.Close();

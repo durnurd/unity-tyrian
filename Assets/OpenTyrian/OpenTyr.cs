@@ -241,10 +241,95 @@ public const string opentyrian_str = "OpenTyrian",
         } while (!quit);
     }
 
+    private static IEnumerator e_downloadAll()
+    {
+        yield return Run(e_download("cubetxt1.dat"));
+        yield return Run(e_download("cubetxt2.dat"));
+        yield return Run(e_download("cubetxt3.dat"));
+        yield return Run(e_download("demo.1"));
+        yield return Run(e_download("demo.2"));
+        yield return Run(e_download("demo.3"));
+        yield return Run(e_download("demo.4"));
+        yield return Run(e_download("demo.5"));
+        yield return Run(e_download("dpmi16bi.ovl"));
+        yield return Run(e_download("estsc.shp"));
+        yield return Run(e_download("exitmsg.bin"));
+        yield return Run(e_download("file_id.diz"));
+        yield return Run(e_download("levels1.dat"));
+        yield return Run(e_download("levels2.dat"));
+        yield return Run(e_download("levels3.dat"));
+        yield return Run(e_download("levels4.dat"));
+        yield return Run(e_download("loudness.awe"));
+        yield return Run(e_download("music.mus"));
+        yield return Run(e_download("netterm.int"));
+        yield return Run(e_download("newshPOUND.shp"));
+        yield return Run(e_download("newsh^.shp"));
+        yield return Run(e_download("newsh~.shp"));
+        yield return Run(e_download("newsh0.shp"));
+        yield return Run(e_download("newsh1.shp"));
+        yield return Run(e_download("newsh2.shp"));
+        yield return Run(e_download("newsh3.shp"));
+        yield return Run(e_download("newsh4.shp"));
+        yield return Run(e_download("newsh5.shp"));
+        yield return Run(e_download("newsh6.shp"));
+        yield return Run(e_download("newsh7.shp"));
+        yield return Run(e_download("newsh8.shp"));
+        yield return Run(e_download("newsh9.shp"));
+        yield return Run(e_download("newsha.shp"));
+        yield return Run(e_download("newshb.shp"));
+        yield return Run(e_download("newshc.shp"));
+        yield return Run(e_download("newshd.shp"));
+        yield return Run(e_download("newshe.shp"));
+        yield return Run(e_download("newshf.shp"));
+        yield return Run(e_download("newshg.shp"));
+        yield return Run(e_download("newshh.shp"));
+        yield return Run(e_download("newshi.shp"));
+        yield return Run(e_download("newshj.shp"));
+        yield return Run(e_download("newshk.shp"));
+        yield return Run(e_download("newshl.shp"));
+        yield return Run(e_download("newshm.shp"));
+        yield return Run(e_download("newshn.shp"));
+        yield return Run(e_download("newsho.shp"));
+        yield return Run(e_download("newshp.shp"));
+        yield return Run(e_download("newshr.shp"));
+        yield return Run(e_download("newshs.shp"));
+        yield return Run(e_download("newsht.shp"));
+        yield return Run(e_download("newshu.shp"));
+        yield return Run(e_download("newshv.shp"));
+        yield return Run(e_download("palette.dat"));
+        yield return Run(e_download("setup.ini"));
+        yield return Run(e_download("shapes).dat"));
+        yield return Run(e_download("shapesw.dat"));
+        yield return Run(e_download("shapesx.dat"));
+        yield return Run(e_download("shapesy.dat"));
+        yield return Run(e_download("shapesz.dat"));
+        yield return Run(e_download("shipedit.pcx"));
+        yield return Run(e_download("tshp2.pcx"));
+        yield return Run(e_download("tyrian.cdt"));
+        yield return Run(e_download("tyrian.hdt"));
+        yield return Run(e_download("tyrian.pic"));
+        yield return Run(e_download("tyrian.shp"));
+        yield return Run(e_download("tyrian.snd"));
+        yield return Run(e_download("tyrian1.lvl"));
+        yield return Run(e_download("tyrian2.lvl"));
+        yield return Run(e_download("tyrian3.lvl"));
+        yield return Run(e_download("tyrian4.lvl"));
+        yield return Run(e_download("tyrianc.shp"));
+        yield return Run(e_download("tyrset.pcx"));
+        yield return Run(e_download("user1.shp"));
+        yield return Run(e_download("user2.shp"));
+        yield return Run(e_download("voices.snd"));
+        yield return Run(e_download("voicesc.snd"));
+    }
+
     public static IEnumerator e_main(int argc, string[] argv)
     { UnityEngine.Debug.Log("e_main");
+#if !UNITY_WEBGL
         QualitySettings.vSyncCount = 0;
         Application.targetFrameRate = 60;
+#endif
+
+        yield return Run(e_downloadAll());
 
         //mt_srand(time(NULL));
 

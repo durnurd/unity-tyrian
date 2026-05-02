@@ -1315,7 +1315,7 @@ public static class DestructC
 
 	/* DE_ResetX
 	 *
-	 * The reset functions clear the state of whatefer they are assigned to.
+	 * The reset functions clear the state of whatever they are assigned to.
 	 */
 	static void DE_ResetUnits()
 	{
@@ -1508,7 +1508,7 @@ public static class DestructC
 	/* DE_RunTickX
 	 *
 	 * Handles something that we do once per tick, such as
-	 * track ammo and move asplosions.
+	 * track ammo and move explosions.
 	 */
 	static void DE_RunTickCycleDeadUnits()
 	{
@@ -1589,7 +1589,7 @@ public static class DestructC
 		anim_index = GraphicBase[team][unit.unitType] + unit.ani_frame;
 		if (unit.unitType == UNIT_HELI)
 		{
-			/* Adjust animation index if we are travelling right or left. */
+			/* Adjust animation index if we are traveling right or left. */
 			if (unit.lastMove < -2)
 				anim_index += 5;
 			else if (unit.lastMove > 2)
@@ -2110,7 +2110,7 @@ public static class DestructC
 				{
 					if (Abs(ptrUnit[ptrUnitIdx].unitX - ptrCurUnit.unitX) < 8)
 					{
-						/* I get it.  This makes helicoptors hover over
+						/* I get it.  This makes helicopters hover over
 						 * their enemies. */
 						if (ptrUnit[ptrUnitIdx].unitType == UNIT_SATELLITE)
 						{

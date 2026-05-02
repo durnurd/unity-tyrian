@@ -56,7 +56,7 @@ public class TestPalette : MonoBehaviour
 
     private void OnDestroy()
     {
-        deinit_audio();
+        //deinit_audio();
     }
 
     public void Escape()

@@ -99,6 +99,11 @@ public static class LoudnessC
             //{
             //    feedme[smp] = (short)(feedme[smp] * music_volume);
             //}
+        } else {
+            for (int i = 0; i < feedme.Length; ++i)
+            {
+                feedme[i] = 0;
+            }
         }
 
         //If we were blending all audio into a single clip:

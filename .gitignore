@@ -2,7 +2,10 @@
 [Tt]emp/
 [Oo]bj/
 [Bb]uild/
-[Bb]uilds/
+# Ignore build outputs except WebGL (tracked for GitHub Pages deploy)
+[Bb]uilds/*
+![Bb]uilds/WebGL/
+![Bb]uilds/WebGL/**
 Assets/AssetStoreTools*
 
 # Visual Studio cache directory
@@ -35,3 +38,4 @@ sysinfo.txt
 *.apk
 *.unitypackage
 .idea
+Logs/

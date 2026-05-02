@@ -1,0 +1,39 @@
+# Deploys Builds/WebGL to the gh-pages branch for GitHub Pages.
+# After the first successful run: Repo Settings → Pages → Source: Deploy from branch → gh-pages / (root).
+
+name: Deploy WebGL to GitHub Pages
+
+on:
+  push:
+    branches:
+      - main
+      - master
+    paths:
+      - "Builds/WebGL/**"
+      - ".github/workflows/deploy-webgl-pages.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: webgl-pages-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Verify WebGL build
+        run: |
+          test -f Builds/WebGL/index.html || (echo "Missing Builds/WebGL/index.html — commit your WebGL build or adjust paths." && exit 1)
+
+      - name: Publish to gh-pages branch
+        uses: peaceiris/actions-gh-pages@v4
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: Builds/WebGL
+          force_orphan: true

@@ -211,7 +211,7 @@ public static class BackgrndC
 
         if (background2)
         {
-            // water effect combines background 1 and 2 by syncronizing the x coordinate
+            // water effect combines background 1 and 2 by synchronizing the x coordinate
             int x = smoothies[1] ? mapXPos : mapX2Pos;
 
             int mapIdx = (smoothies[1] ? mapXbpPos : mapX2bpPos) - 12;

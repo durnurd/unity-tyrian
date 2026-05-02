@@ -74,11 +74,9 @@ public static class FontHandC
     public static JE_byte warningCol;
     public static JE_shortint warningColChange;
 
-    public static void JE_dString(Surface screen, int x, int y, string s, ushort font)
+    public static void JE_dString(Surface screen, int x, int y, string s, ushort font, int bright = 0)
     {
         const JE_integer defaultBrightness = -3;
-
-        int bright = 0;
 
         for (int i = 0; i < s.Length && s[i] != '\0'; ++i)
         {
@@ -168,7 +166,13 @@ public static class FontHandC
             sharedBuffer[index++] = (char)(digit + '0');
             value /= 10;
         }
-        System.Array.Reverse(sharedBuffer, start, index - start);
+
+        for (int i = start, j = index - 1; i < j; ++i, --j)
+        {
+            JE_char tmp = sharedBuffer[j];
+            sharedBuffer[j] = sharedBuffer[i];
+            sharedBuffer[i] = tmp;
+        }
 
         if (suffix != null)
         {

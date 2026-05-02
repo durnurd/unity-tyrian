@@ -46,8 +46,8 @@ public static class VideoC
 
     public static Vector2 scaleToVGA(Vector2 v)
     {
-        v.x = v.x / Screen.width * 320;
-        v.y = v.y / Screen.height * 200;
+        v.x = v.x / Screen.width * vga_width;
+        v.y = v.y / Screen.height * vga_height;
         return v;
     }
 }

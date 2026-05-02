@@ -661,7 +661,7 @@ public static class GameMenuC
                         JE_drawItem((JE_byte)(curSel[1] - 1), (JE_word)temp, 160, (JE_word)(tempY - 4));
                     }
 
-                    /* Make selected text brigther */
+                    /* Make selected text brighter */
                     temp2 = (tempW == curSel[curMenu] - 1) ? 15 : 28;
 
                     /* Draw Cost: if it's not the DONE option */
@@ -790,7 +790,7 @@ public static class GameMenuC
 
                         blit_sprite(VGAScreenSeg, face_x, face_y, FACE_SHAPES, face_sprite);  // datacube face
 
-                        // modify pallete for face
+                        // modify palette for face
                         paletteChanged = true;
                         temp2 = facepal[face_sprite];
 
@@ -1978,10 +1978,9 @@ public static class GameMenuC
                 tempY -= 16;
             }
 
-            string str = curSel[curMenu] == x ? "~" : "";
-            str += menuInt[curMenu + 1][x - 1];
+            string str = menuInt[curMenu + 1][x - 1];
 
-            JE_dString(VGAScreen, 166, tempY, str, SMALL_FONT_SHAPES);
+            JE_dString(VGAScreen, 166, tempY, str, SMALL_FONT_SHAPES, curSel[curMenu] == x ? 2 : 0);
 
             if (keyboardUsed && curSel[curMenu] == x)
             {
@@ -2380,7 +2379,7 @@ public static class GameMenuC
         {
             tempStr = mainMenuHelp[24 - 1];
         }
-        else if ((temp == menuChoices[curMenu] - 1) || ((curMenu == 7) && (cubeMax == 0)))
+        else if ((temp == menuChoices[curMenu] - 2) || ((curMenu == 7) && (cubeMax == 0)))
         {
             tempStr = mainMenuHelp[12 - 1];
         }

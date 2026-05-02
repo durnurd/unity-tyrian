@@ -274,7 +274,7 @@ public static class MainIntC
                 }
             }
 
-            if (temp2 == 1) // if exactly one direction pressed or firebutton is released
+            if (temp2 == 1) // if exactly one direction pressed or fire button is released
             {
                 temp += button[0] ? 4 : 0;
 
@@ -2021,12 +2021,30 @@ public static class MainIntC
                             int playerY = this_player.y + 7 + this_player.shot_hit_area_y * 3 / 2;
                             mouseXC += (short)(touch0Pos.x - playerX);
                             mouseYC += (short)(touch0Pos.y - playerY);
+
+                            for (int i = 0; i < count; ++i)
+                            {
+                                var touch = Input.GetTouch(i);
+                                if (touch.phase == TouchPhase.Began)
+                                {
+                                    var pos = touch.position;
+                                    pos.y = Screen.height - pos.y;
+                                    pos = scaleToVGA(pos);
+                                    //"Rear Weapon" area of the HUD
+                                    if (pos.x >= 281 && pos.y >= 22 && pos.x <= (281 + 34) && pos.y >= (22 + 40))
+                                    {
+                                        button[3] = true;
+                                        break;
+                                    }
+                                }
+                            }
                         }
                         else
                         {
                             button[0] = false;
                             button[1] = false;
                             button[2] = false;
+                            button[3] = false;
                         }
                     }
 
@@ -2758,7 +2776,7 @@ public static class MainIntC
                             this_player.sidekick[LEFT_SIDEKICK].x = this_player.x;
                             this_player.sidekick[LEFT_SIDEKICK].y = Max(10, this_player.y - 20);
                             break;
-                        case 4:  // orbitting
+                        case 4:  // orbiting
                             this_player.sidekick[LEFT_SIDEKICK].x = (short)(this_player.x + Round(Sin(optionSatelliteRotate) * 20));
                             this_player.sidekick[LEFT_SIDEKICK].y = (short)(this_player.y + Round(Cos(optionSatelliteRotate) * 20));
                             break;
@@ -2766,7 +2784,7 @@ public static class MainIntC
 
                     switch (this_player.sidekick[RIGHT_SIDEKICK].style)
                     {
-                        case 4:  // orbitting
+                        case 4:  // orbiting
                             this_player.sidekick[RIGHT_SIDEKICK].x = (short)(this_player.x - Round(Sin(optionSatelliteRotate) * 20));
                             this_player.sidekick[RIGHT_SIDEKICK].y = (short)(this_player.y - Round(Cos(optionSatelliteRotate) * 20));
                             break;
@@ -4216,7 +4234,7 @@ public static class MainIntC
             helpBoxBrightness = 3;
             JE_HBox(VGAScreen, 40, 43, 34, 44);
 
-            // sheild/armor help
+            // shield/armor help
             blit_sprite(VGAScreenSeg, 2, 79, OPTION_SHAPES, 42);
             helpBoxColor = 5;
             helpBoxBrightness = 3;

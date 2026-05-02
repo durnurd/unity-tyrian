@@ -23,7 +23,7 @@ public static class VGA256dC
 
     public static void JE_pix3(Surface surface, int x, int y, JE_byte c)
     {
-        /* Originally impemented as several direct accesses */
+        /* Originally implemented as several direct accesses */
         JE_pix(surface, x, y, c);
         JE_pix(surface, x - 1, y, c);
         JE_pix(surface, x + 1, y, c);
@@ -127,9 +127,9 @@ public static class VGA256dC
         }
     }
 
-    static void fill_rectangle_hw(Surface surface, int x, int y, int h, int w, byte color)
+    static void fill_rectangle_wh(Surface surface, int x, int y, int w, int h, byte color)
     {
-        fill_rectangle_xy(surface, x, y, x + w - 1, y + h - 1, color);
+        fill_rectangle_xy(surface, x, y, x + h - 1, y + w - 1, color);
     }
 
     public static void draw_segmented_gauge(Surface surface, int x, int y, byte color, int segment_width, int segment_height, int segment_value, int value)
@@ -139,10 +139,10 @@ public static class VGA256dC
 
         for (int i = 0; i < segments; ++i)
         {
-            fill_rectangle_hw(surface, x, y, segment_width, segment_height, (byte)(color + 12));
+            fill_rectangle_wh(surface, x, y, segment_width, segment_height, (byte)(color + 12));
             x += segment_width + 1;
         }
         if (partial_segment > 0)
-            fill_rectangle_hw(surface, x, y, segment_width, segment_height, (byte)(color + (12 * partial_segment / segment_value)));
+            fill_rectangle_wh(surface, x, y, segment_width, segment_height, (byte)(color + (12 * partial_segment / segment_value)));
     }
 }

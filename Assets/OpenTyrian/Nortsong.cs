@@ -15,6 +15,7 @@ using static JoystickC;
 using static FileIO;
 
 using System.IO;
+using System.Collections.Generic;
 
 public static class NortsongC {
     public static uint target, target2;
@@ -64,13 +65,24 @@ public static class NortsongC {
         return Time.time * 1000 < target;
     }
 
+#if UNITY_WEBGL
+    private static float targetFPS = 1 / 60f;
+#else
     private static float targetFPS = 1 / Application.targetFrameRate;
+#endif
+    private static Dictionary<int, WaitForSeconds> cachedDelays = new Dictionary<JE_longint, WaitForSeconds>();
     public static WaitForSeconds coroutine_wait_delay()
     {
         float delay = target / 1000.0f - Time.time;
-        //if (delay < 1f / targetFPS)
-        //    return null;
-        return new WaitForSeconds(delay);
+        if (delay < 0)
+        {
+            return null;
+        }
+        int ticks = (int)(delay * 1000);
+        if (cachedDelays.ContainsKey(ticks)) {
+            return cachedDelays[ticks];
+        }
+        return cachedDelays[ticks] = new WaitForSeconds(delay);
     }
 
     public static uint SDL_GetTicks()

@@ -1,0 +1,713 @@
+fileFormatVersion: 2
+guid: 95ef980a72968e24db9a195ff5fa5970
+TextureImporter:
+  internalIDToNameTable:
+  - first:
+      213: 21300000
+    second: newshi.shp.000000_6
+  - first:
+      213: 21300002
+    second: newshi.shp.000000_15
+  - first:
+      213: 21300004
+    second: newshi.shp.000000_24
+  - first:
+      213: 21300006
+    second: newshi.shp.000000_33
+  - first:
+      213: 21300008
+    second: newshi.shp.000000_34
+  - first:
+      213: 21300010
+    second: newshi.shp.000000_38
+  - first:
+      213: 21300012
+    second: newshi.shp.000000_50
+  - first:
+      213: 21300014
+    second: newshi.shp.000000_55
+  - first:
+      213: 21300016
+    second: newshi.shp.000000_56
+  - first:
+      213: 21300018
+    second: newshi.shp.000000_57
+  - first:
+      213: 21300020
+    second: newshi.shp.000000_0
+  - first:
+      213: 21300022
+    second: newshi.shp.000000_1
+  - first:
+      213: 21300024
+    second: newshi.shp.000000_2
+  - first:
+      213: 21300026
+    second: newshi.shp.000000_3
+  - first:
+      213: 21300028
+    second: newshi.shp.000000_4
+  - first:
+      213: 21300030
+    second: newshi.shp.000000_5
+  - first:
+      213: 21300032
+    second: newshi.shp.000000_7
+  externalObjects: {}
+  serializedVersion: 13
+  mipmaps:
+    mipMapMode: 0
+    enableMipMap: 0
+    sRGBTexture: 1
+    linearTexture: 0
+    fadeOut: 0
+    borderMipMap: 0
+    mipMapsPreserveCoverage: 0
+    alphaTestReferenceValue: 0.5
+    mipMapFadeDistanceStart: 1
+    mipMapFadeDistanceEnd: 3
+  bumpmap:
+    convertToNormalMap: 0
+    externalNormalMap: 0
+    heightScale: 0.25
+    normalMapFilter: 0
+    flipGreenChannel: 0
+  isReadable: 0
+  streamingMipmaps: 0
+  streamingMipmapsPriority: 0
+  vTOnly: 0
+  ignoreMipmapLimit: 0
+  grayScaleToAlpha: 0
+  generateCubemap: 6
+  cubemapConvolution: 0
+  seamlessCubemap: 0
+  textureFormat: 1
+  maxTextureSize: 2048
+  textureSettings:
+    serializedVersion: 2
+    filterMode: 0
+    aniso: 1
+    mipBias: 0
+    wrapU: 1
+    wrapV: 1
+    wrapW: 1
+  nPOTScale: 0
+  lightmap: 0
+  compressionQuality: 50
+  spriteMode: 2
+  spriteExtrude: 1
+  spriteMeshType: 1
+  alignment: 0
+  spritePivot: {x: 0.5, y: 0.5}
+  spritePixelsToUnits: 100
+  spriteBorder: {x: 0, y: 0, z: 0, w: 0}
+  spriteGenerateFallbackPhysicsShape: 1
+  alphaUsage: 1
+  alphaIsTransparency: 1
+  spriteTessellationDetail: -1
+  textureType: 8
+  textureShape: 1
+  singleChannelComponent: 0
+  flipbookRows: 1
+  flipbookColumns: 1
+  maxTextureSizeSet: 0
+  compressionQualitySet: 0
+  textureFormatSet: 0
+  ignorePngGamma: 0
+  applyGammaDecoding: 1
+  swizzle: 50462976
+  cookieLightType: 1
+  platformSettings:
+  - serializedVersion: 4
+    buildTarget: DefaultTexturePlatform
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 0
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 1
+  - serializedVersion: 4
+    buildTarget: Standalone
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 0
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 1
+  - serializedVersion: 4
+    buildTarget: WebGL
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 0
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 1
+  spriteSheet:
+    serializedVersion: 2
+    sprites:
+    - serializedVersion: 2
+      name: newshi.shp.000000_6
+      rect:
+        serializedVersion: 2
+        x: 192
+        y: 196
+        width: 24
+        height: 28
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline:
+      - - {x: -5, y: 3}
+        - {x: -12, y: -6}
+        - {x: -12, y: -14}
+        - {x: 12, y: -14}
+        - {x: 12, y: 6}
+        - {x: 1, y: 6}
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 02305410000000000800000000000000
+      internalID: 21300000
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: newshi.shp.000000_15
+      rect:
+        serializedVersion: 2
+        x: 192
+        y: 168
+        width: 24
+        height: 28
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline:
+      - - {x: -12, y: 6}
+        - {x: -12, y: -14}
+        - {x: 12, y: -14}
+        - {x: 12, y: -2}
+        - {x: 2, y: 6}
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 22305410000000000800000000000000
+      internalID: 21300002
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: newshi.shp.000000_24
+      rect:
+        serializedVersion: 2
+        x: 192
+        y: 140
+        width: 24
+        height: 28
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline:
+      - - {x: -12, y: 14}
+        - {x: -12, y: -14}
+        - {x: 12, y: -14}
+        - {x: 12, y: 14}
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 42305410000000000800000000000000
+      internalID: 21300004
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: newshi.shp.000000_33
+      rect:
+        serializedVersion: 2
+        x: 192
+        y: 112
+        width: 24
+        height: 28
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline:
+      - - {x: -12, y: 14}
+        - {x: -12, y: -14}
+        - {x: 12, y: -14}
+        - {x: 12, y: 14}
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 62305410000000000800000000000000
+      internalID: 21300006
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: newshi.shp.000000_34
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 84
+        width: 96
+        height: 140
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline:
+      - - {x: -16, y: 62}
+        - {x: -48, y: 21}
+        - {x: -48, y: -39}
+        - {x: -19, y: -70}
+        - {x: 20, y: -70}
+        - {x: 48, y: -44}
+        - {x: 48, y: 20}
+        - {x: 17, y: 62}
+      - - {x: 9, y: 48}
+        - {x: 9, y: 47}
+        - {x: 8, y: 46}
+        - {x: 9, y: 46}
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 82305410000000000800000000000000
+      internalID: 21300008
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: newshi.shp.000000_38
+      rect:
+        serializedVersion: 2
+        x: 96
+        y: 84
+        width: 96
+        height: 140
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline:
+      - - {x: -16, y: 62}
+        - {x: -48, y: 27}
+        - {x: -48, y: -43}
+        - {x: -17, y: -70}
+        - {x: 23, y: -70}
+        - {x: 48, y: -21}
+        - {x: 48, y: 27}
+        - {x: 20, y: 62}
+      - - {x: 18, y: 42}
+        - {x: 11, y: 45}
+        - {x: 17, y: 39}
+        - {x: 20, y: 38}
+        - {x: 20, y: 40}
+      - - {x: -15, y: 42}
+        - {x: -12, y: 46}
+        - {x: -10, y: 46}
+        - {x: -10, y: 45}
+        - {x: -17, y: 42}
+        - {x: -18, y: 39}
+        - {x: -16, y: 39}
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: a2305410000000000800000000000000
+      internalID: 21300010
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: newshi.shp.000000_50
+      rect:
+        serializedVersion: 2
+        x: 96
+        y: 0
+        width: 96
+        height: 84
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline:
+      - - {x: 9, y: 41}
+        - {x: -9, y: 41}
+        - {x: -28, y: 37}
+        - {x: -22, y: 19}
+        - {x: -43, y: 15}
+        - {x: -48, y: 13}
+        - {x: -48, y: 5}
+        - {x: -43, y: -6}
+        - {x: -16, y: -42}
+        - {x: 16, y: -42}
+        - {x: 48, y: -16}
+        - {x: 48, y: 20}
+        - {x: 25, y: 39}
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: c2305410000000000800000000000000
+      internalID: 21300012
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: newshi.shp.000000_55
+      rect:
+        serializedVersion: 2
+        x: 12
+        y: 0
+        width: 24
+        height: 28
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline:
+      - - {x: -12, y: 14}
+        - {x: -12, y: 0}
+        - {x: -11, y: -9}
+        - {x: 2, y: -9}
+        - {x: 6, y: -8}
+        - {x: 12, y: 4}
+        - {x: 12, y: 14}
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: e2305410000000000800000000000000
+      internalID: 21300014
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: newshi.shp.000000_56
+      rect:
+        serializedVersion: 2
+        x: 36
+        y: 0
+        width: 24
+        height: 28
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline:
+      - - {x: -12, y: 14}
+        - {x: -12, y: 2}
+        - {x: -6, y: -8}
+        - {x: 7, y: -8}
+        - {x: 12, y: 0}
+        - {x: 12, y: 14}
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 03305410000000000800000000000000
+      internalID: 21300016
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: newshi.shp.000000_57
+      rect:
+        serializedVersion: 2
+        x: 60
+        y: 0
+        width: 24
+        height: 28
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline:
+      - - {x: -12, y: 14}
+        - {x: -12, y: 1}
+        - {x: -11, y: -7}
+        - {x: -5, y: -9}
+        - {x: 9, y: -9}
+        - {x: 12, y: -3}
+        - {x: 12, y: 14}
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 23305410000000000800000000000000
+      internalID: 21300018
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: newshi.shp.000000_0
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 0
+        width: 96
+        height: 84
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline:
+      - - {x: 9, y: 41}
+        - {x: -9, y: 41}
+        - {x: -28, y: 37}
+        - {x: -22, y: 19}
+        - {x: -48, y: 20}
+        - {x: -48, y: -14}
+        - {x: 48, y: -14}
+        - {x: 48, y: 20}
+        - {x: 25, y: 39}
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 43305410000000000800000000000000
+      internalID: 21300020
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: newshi.shp.000000_1
+      rect:
+        serializedVersion: 2
+        x: 216
+        y: 210
+        width: 12
+        height: 14
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline:
+      - - {x: -4, y: 7}
+        - {x: -6, y: 5}
+        - {x: -6, y: -5}
+        - {x: -4, y: -7}
+        - {x: 4, y: -7}
+        - {x: 6, y: -5}
+        - {x: 6, y: 5}
+        - {x: 4, y: 7}
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 63305410000000000800000000000000
+      internalID: 21300022
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: newshi.shp.000000_2
+      rect:
+        serializedVersion: 2
+        x: 216
+        y: 196
+        width: 12
+        height: 14
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline:
+      - - {x: -4, y: 7}
+        - {x: -6, y: 5}
+        - {x: -6, y: -5}
+        - {x: -4, y: -7}
+        - {x: 4, y: -7}
+        - {x: 6, y: -5}
+        - {x: 6, y: 5}
+        - {x: 4, y: 7}
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 83305410000000000800000000000000
+      internalID: 21300024
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: newshi.shp.000000_3
+      rect:
+        serializedVersion: 2
+        x: 216
+        y: 182
+        width: 12
+        height: 14
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline:
+      - - {x: -4, y: 7}
+        - {x: -6, y: 5}
+        - {x: -6, y: -5}
+        - {x: -4, y: -7}
+        - {x: 4, y: -7}
+        - {x: 6, y: -5}
+        - {x: 6, y: 5}
+        - {x: 4, y: 7}
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: a3305410000000000800000000000000
+      internalID: 21300026
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: newshi.shp.000000_4
+      rect:
+        serializedVersion: 2
+        x: 216
+        y: 168
+        width: 12
+        height: 14
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline:
+      - - {x: -4, y: 7}
+        - {x: -6, y: 5}
+        - {x: -6, y: -5}
+        - {x: -4, y: -7}
+        - {x: 4, y: -7}
+        - {x: 6, y: -5}
+        - {x: 6, y: 5}
+        - {x: 4, y: 7}
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: c3305410000000000800000000000000
+      internalID: 21300028
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: newshi.shp.000000_5
+      rect:
+        serializedVersion: 2
+        x: 216
+        y: 154
+        width: 12
+        height: 14
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline:
+      - - {x: -4, y: 7}
+        - {x: -6, y: 5}
+        - {x: -6, y: -5}
+        - {x: -4, y: -7}
+        - {x: 4, y: -7}
+        - {x: 6, y: -5}
+        - {x: 6, y: 5}
+        - {x: 4, y: 7}
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: e3305410000000000800000000000000
+      internalID: 21300030
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: newshi.shp.000000_7
+      rect:
+        serializedVersion: 2
+        x: 216
+        y: 140
+        width: 12
+        height: 14
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline:
+      - - {x: -3, y: 6}
+        - {x: -6, y: 3}
+        - {x: -6, y: -3}
+        - {x: -3, y: -6}
+        - {x: 3, y: -6}
+        - {x: 6, y: -3}
+        - {x: 6, y: 3}
+        - {x: 3, y: 6}
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 04305410000000000800000000000000
+      internalID: 21300032
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    outline: []
+    customData: 
+    physicsShape: []
+    bones: []
+    spriteID: 
+    internalID: 0
+    vertices: []
+    indices: 
+    edges: []
+    weights: []
+    secondaryTextures: []
+    spriteCustomMetadata:
+      entries: []
+    nameFileIdTable:
+      newshi.shp.000000_0: 21300020
+      newshi.shp.000000_1: 21300022
+      newshi.shp.000000_15: 21300002
+      newshi.shp.000000_2: 21300024
+      newshi.shp.000000_24: 21300004
+      newshi.shp.000000_3: 21300026
+      newshi.shp.000000_33: 21300006
+      newshi.shp.000000_34: 21300008
+      newshi.shp.000000_38: 21300010
+      newshi.shp.000000_4: 21300028
+      newshi.shp.000000_5: 21300030
+      newshi.shp.000000_50: 21300012
+      newshi.shp.000000_55: 21300014
+      newshi.shp.000000_56: 21300016
+      newshi.shp.000000_57: 21300018
+      newshi.shp.000000_6: 21300000
+      newshi.shp.000000_7: 21300032
+  mipmapLimitGroupName: 
+  pSDRemoveMatte: 0
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
