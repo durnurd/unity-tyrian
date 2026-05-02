@@ -4,13 +4,12 @@
 name: Deploy WebGL to GitHub Pages
 
 on:
+  # No paths filter: a paths filter skips the workflow entirely when a push only
+  # touches other files, which is easy to miss. Every push to these branches redeploys.
   push:
     branches:
       - main
       - master
-    paths:
-      - "Builds/WebGL/**"
-      - ".github/workflows/deploy-webgl-pages.yml"
   workflow_dispatch:
 
 permissions:
